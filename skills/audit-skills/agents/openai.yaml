@@ -1,0 +1,4 @@
+interface:
+  display_name: "Audit Skills"
+  short_description: "Review skills for DRY, brevity, and structure"
+  default_prompt: "Use $audit-skills to review these skills for DRYness, brevity, and proper use of references and scripts."

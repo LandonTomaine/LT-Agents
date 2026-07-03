@@ -1,0 +1,4 @@
+interface:
+  display_name: "Audit Docs"
+  short_description: "Review repo docs for drift and clarity"
+  default_prompt: "Use $audit-docs to review this repository documentation for stale, duplicated, missing, or unclear guidance."

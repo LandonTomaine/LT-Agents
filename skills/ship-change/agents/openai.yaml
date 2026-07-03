@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ship Change"
+  short_description: "Analyze, implement, commit, and push"
+  default_prompt: "Use $ship-change to take this request from analysis through implementation, validation, approved commit, and push."
