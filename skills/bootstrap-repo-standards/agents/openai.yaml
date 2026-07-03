@@ -1,0 +1,4 @@
+interface:
+  display_name: "Bootstrap Repo Standards"
+  short_description: "Audit and shape repo standards"
+  default_prompt: "Use $bootstrap-repo-standards to audit this repository and guide me through standards, documentation maintenance, local setup, deployment, validation, skills, and quality gate decisions before writing durable files."
