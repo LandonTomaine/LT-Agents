@@ -33,13 +33,13 @@ Skill packages should stay portable and easy to install:
 
 This is currently a private repo. People need repository access before they can clone, download, or install these skills from GitHub.
 
-Install with Codex skill installer:
+In Codex, ask the skill installer to install the skill you want:
 
 ```text
-$skill-installer install https://github.com/LandonTomaine/LT-Agents/tree/main/skills/audit-docs
-$skill-installer install https://github.com/LandonTomaine/LT-Agents/tree/main/skills/audit-skills
-$skill-installer install https://github.com/LandonTomaine/LT-Agents/tree/main/skills/bootstrap-repo-standards
-$skill-installer install https://github.com/LandonTomaine/LT-Agents/tree/main/skills/ship-change
+Use $skill-installer to install https://github.com/LandonTomaine/LT-Agents/tree/main/skills/audit-docs
+Use $skill-installer to install https://github.com/LandonTomaine/LT-Agents/tree/main/skills/audit-skills
+Use $skill-installer to install https://github.com/LandonTomaine/LT-Agents/tree/main/skills/bootstrap-repo-standards
+Use $skill-installer to install https://github.com/LandonTomaine/LT-Agents/tree/main/skills/ship-change
 ```
 
 Manual install after cloning:

@@ -372,7 +372,6 @@ def collect_runtime_surface_hints(root: Path, files: list[Path]) -> dict[str, li
 
         if name in deployment_names or lowered.startswith((
             ".cloudflare/",
-            ".github/workflows/",
             "cloudflare/",
             "helm/",
             "infra/",
@@ -438,7 +437,10 @@ def collect_runtime_surface_hints(root: Path, files: list[Path]) -> dict[str, li
         ):
             add_hint(result, "worker_or_job", relative)
 
-        if any(marker in lowered for marker in ["migrations/", "migration", "seed", "database/", "db/"]):
+        if any(
+            marker in lowered
+            for marker in ["migrations/", "/migration/", "seeds/", "seed/", "database/", "db/"]
+        ):
             add_hint(result, "database_or_migration", relative)
 
         if any(
