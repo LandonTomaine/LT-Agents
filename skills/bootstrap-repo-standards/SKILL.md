@@ -1,6 +1,6 @@
 ---
 name: bootstrap-repo-standards
-description: Deeply inspect a new or existing repository, starting with the bundled read-only repo_scan.py inventory script, then interview the user about product, architecture, coding standards, local and deployed validation, quality gates, documentation, agent rules, and repo-local skills before proposing a standards backbone with a durable tracked bootstrap checklist. Continue asking, discussing, tracking, and revising until the user says the skill is done or every question and checklist item is resolved with no material ambiguity. Use when Codex should bootstrap or overhaul repo guidance, AGENTS.md, agent-rules indexes, shared docs, linters, formatters, hooks, CI gates, architecture tests, validation workflows, or reusable Codex skills for a small through medium app, service, library, infrastructure, edge, SaaS, or integration-heavy repo.
+description: Bootstrap or overhaul repository standards for a small to medium app, service, library, infrastructure, SaaS, edge, or integration-heavy repo. Use when Codex should inspect a repo with bundled repo_scan.py, interview about product and architecture decisions, and propose approved docs, AGENTS.md, agent rules, linters, formatters, tests, CI, hooks, validation workflows, repo-local skills, and a durable bootstrap checklist before writing files.
 ---
 
 # Bootstrap Repo Standards
@@ -202,30 +202,6 @@ If not done, ask the next highest-risk unresolved question and keep working.
 - Do not use scaffold overwrite for existing guidance files. Prefer targeted patches.
 - Use scaffold overwrite only for newly generated temp drafts or exact path-level replacement approved by the user.
 - Before any write-mode script, state mode, target root, file sets, and whether durable files may be written.
-
-## Candidate Defaults
-
-Use these as candidate patterns, not universal rules:
-
-- Tiny `AGENTS.md` that routes to an agent index.
-- `agent-rules/README.md` as the routing layer.
-- Always-load agent files for core behavior and communication only.
-- Shared `docs/` for product, architecture, development, local setup, deployment/release, testing, tooling, workflow, commits, PRs, and work tracking.
-- `docs/development/bootstrap-checklist.md` as the durable tracked ledger of what the bootstrap found, what exists, what is missing, what is not applicable, and what is deferred.
-- `docs/development/documentation.md` for documentation ownership, update triggers, stale-doc prevention, and docs review expectations when no adequate existing doc exists.
-- `docs/development/standards-roadmap.md` as an optional non-always-loaded TODO/roadmap for deferred quality gates and standards work such as linters, architecture tests, hooks, CI, security checks, dependency checks, generated-file checks, validation docs, or deployment docs.
-- `docs/development/local-setup.md` for prerequisites, install/restore, secrets/env, local services, run commands, local URLs/interfaces, data setup, and troubleshooting when no adequate existing doc exists.
-- `docs/development/deployment.md` for environments, deploy/release/publish ownership, commands or pipelines, config/secrets, migrations, smoke checks, rollback/stop rules, and access constraints when no adequate existing doc exists.
-- `docs/development/validation.md` for local and deployed validation expectations, environment-specific smoke checks, manual checks, credentials/test-data assumptions, and completion proof.
-- `docs/development/work-tracking.md` as the generic TODO placeholder when the repo uses GitHub, Azure DevOps, Linear, Jira, or another external tracker but the workflow is not decided yet.
-- `docs/backlog/` only when the user chooses file-based PRD/backlog management; scaffold with `--set file-backlog`.
-- Architecture tests as executable standards where stack support exists.
-- Formatter/linter/static-analysis gates documented beside the actual configs.
-- Hooks and CI that mirror the same meaningful checks.
-- Repo-local skills under `.agents/skills`; offer migration for legacy `.codex/skills`.
-- A minimal `review-changed-code` repo-local starter skill when skill scaffolding is approved and no equivalent exists.
-- A focused `update-documentation` repo-local skill when docs maintenance is repeated, repo-specific, and too procedural for a short shared doc.
-- Validation skills only when the corresponding surface exists and the workflow is repeated. Propose UI/browser validation only for repos with a confirmed UI; otherwise ask about API, CLI, worker/job, package/library, migration, or deployed smoke validation instead.
 
 ## Outputs
 
