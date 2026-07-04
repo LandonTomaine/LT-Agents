@@ -115,6 +115,73 @@ Shared documentation for humans and agents.
     "documentation": {
         "docs/development/documentation.md": placeholder("Documentation Maintenance"),
     },
+    "bootstrap-checklist": {
+        "docs/development/bootstrap-checklist.md": """# Bootstrap Checklist
+
+Durable checklist for the repository standards bootstrap. Update this file when the repo gains, rejects, or defers standards, docs, tooling, validation, or agent guidance.
+
+Status values:
+
+- `present`: exists and is adequate for current repo needs
+- `partial`: exists but has known gaps
+- `missing`: needed but absent
+- `not applicable`: intentionally not relevant for this repo
+- `defer`: intentionally postponed with an owner or trigger
+- `rejected`: intentionally not wanted
+
+## Repository Shape
+
+| Area | Status | Evidence | Decision or Next Step |
+| --- | --- | --- | --- |
+| Repo purpose and audience | missing |  |  |
+| Runtime surfaces identified | missing |  |  |
+| Package managers and project files | missing |  |  |
+
+## Human Documentation
+
+| Area | Status | Evidence | Decision or Next Step |
+| --- | --- | --- | --- |
+| README entrypoint | missing |  |  |
+| Local setup and run docs | missing |  |  |
+| Deployment, release, or publish docs | missing |  |  |
+| Documentation maintenance rules | missing |  |  |
+| Work tracking guidance | missing |  |  |
+
+## Product and Architecture
+
+| Area | Status | Evidence | Decision or Next Step |
+| --- | --- | --- | --- |
+| Product overview | missing |  |  |
+| Domain terms and workflows | missing |  |  |
+| Architecture overview | missing |  |  |
+| Coding standards | missing |  |  |
+
+## Validation and Quality Gates
+
+| Area | Status | Evidence | Decision or Next Step |
+| --- | --- | --- | --- |
+| Local validation command matrix | missing |  |  |
+| Deployed validation expectations | missing |  |  |
+| Unit tests | missing |  |  |
+| Integration or contract tests | missing |  |  |
+| Formatter | missing |  |  |
+| Linters | missing |  |  |
+| Static analysis | missing |  |  |
+| Architecture tests or source guards | missing |  |  |
+| Git hooks | missing |  |  |
+| CI gates | missing |  |  |
+| Dependency, license, vulnerability, or secret checks | missing |  |  |
+
+## Agent Guidance and Skills
+
+| Area | Status | Evidence | Decision or Next Step |
+| --- | --- | --- | --- |
+| AGENTS.md or agent entrypoint | missing |  |  |
+| Agent routing docs | missing |  |  |
+| Repo-local skills | missing |  |  |
+| Skill migration status | missing |  |  |
+""",
+    },
     "standards-roadmap": {
         "docs/development/standards-roadmap.md": placeholder("Standards Roadmap"),
     },

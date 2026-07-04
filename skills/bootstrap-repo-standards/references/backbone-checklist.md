@@ -70,6 +70,38 @@ Default path when approved: `docs/development/standards-roadmap.md`.
 
 Do not create it by default. If details are known and approved, write real checklist items; otherwise use a short approved TODO placeholder.
 
+## Durable Bootstrap Checklist Choice
+
+Default path: `docs/development/bootstrap-checklist.md`.
+
+Propose this file in the first manifest unless the user rejects a durable checklist. It is the tracked repo ledger for what the bootstrap found, what exists, what is missing, what is not applicable, and what is deferred.
+
+Use status values consistently:
+
+- `present`: exists and is adequate for current repo needs.
+- `partial`: exists but has known gaps.
+- `missing`: needed but absent.
+- `not applicable`: intentionally not relevant for this repo.
+- `defer`: postponed with owner or trigger.
+- `rejected`: intentionally not wanted.
+
+Checklist rows should include:
+
+- area
+- status
+- evidence path for `present` or `partial`
+- decision or next step
+
+Recommended checklist categories:
+
+- repository shape: purpose, audience, runtime surfaces, package managers, project files
+- human documentation: README, local setup/run, deployment/release/publish, documentation maintenance, work tracking
+- product and architecture: product overview, domain terms, workflows, architecture overview, coding standards
+- validation and quality gates: local validation, deployed validation, unit tests, integration/contract tests, formatter, linters, static analysis, architecture tests, hooks, CI, dependency/security checks
+- agent guidance and skills: AGENTS.md, agent routing docs, repo-local skills, skill migration status
+
+Keep future work here as standards/bootstrap follow-up. Use `docs/development/standards-roadmap.md` only when the user wants a separate roadmap for phased adoption detail.
+
 ## Quality Gates
 
 Look for or propose stack-appropriate equivalents:

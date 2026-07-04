@@ -1,4 +1,4 @@
 interface:
   display_name: "Bootstrap Repo Standards"
   short_description: "Audit and shape repo standards"
-  default_prompt: "Use $bootstrap-repo-standards to audit this repository and guide me through standards, documentation maintenance, local setup, deployment, validation, skills, and quality gate decisions before writing durable files."
+  default_prompt: "Use $bootstrap-repo-standards to audit this repository; start by running the bundled repo_scan.py, then propose a durable bootstrap checklist plus standards, documentation maintenance, local setup, deployment, validation, skills, and quality gate decisions before writing durable files."
