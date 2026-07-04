@@ -1,6 +1,6 @@
 # LT Agents
 
-Private collection of Codex skills, agent instructions, references, and maintenance notes.
+Private catalog of reusable Codex skills, agent instructions, references, and maintenance notes.
 
 This repository is organized as a durable home for reusable agent knowledge. Each skill is kept as a self-contained package under `skills/`, with repository-level docs used only for indexing, contribution rules, and collection-wide conventions.
 
@@ -10,6 +10,7 @@ This repository is organized as a durable home for reusable agent knowledge. Eac
 | --- | --- |
 | `skills/` | Installable or reusable Codex skill packages. |
 | `docs/` | Collection-level notes, curation standards, and operating conventions. |
+| `scripts/` | Catalog maintenance and validation helpers. |
 | `AGENTS.md` | Instructions for Codex agents working in this repository. |
 
 ## Skills
@@ -28,15 +29,34 @@ Skill packages should stay portable and easy to install:
 - `scripts/` contains deterministic helpers used by the skill.
 - `agents/` contains UI or marketplace metadata when needed.
 
-## Local Use
+## Install Skills
 
-To use a skill from this repo, copy or sync the skill directory into your Codex skills directory, for example:
+This is currently a private repo. People need repository access before they can clone, download, or install these skills from GitHub.
 
-```powershell
-Copy-Item -Recurse -Force .\skills\bootstrap-repo-standards $env:USERPROFILE\.codex\skills\
+Install with Codex skill installer:
+
+```text
+$skill-installer install https://github.com/LandonTomaine/LT-Agents/tree/main/skills/audit-docs
+$skill-installer install https://github.com/LandonTomaine/LT-Agents/tree/main/skills/audit-skills
+$skill-installer install https://github.com/LandonTomaine/LT-Agents/tree/main/skills/bootstrap-repo-standards
+$skill-installer install https://github.com/LandonTomaine/LT-Agents/tree/main/skills/ship-change
 ```
 
-Keep the package directory name stable because Codex uses it as part of skill discovery.
+Manual install after cloning:
+
+```powershell
+Copy-Item -Recurse -Force .\skills\<skill-name> $env:USERPROFILE\.codex\skills\
+```
+
+Install every skill in this repo:
+
+```powershell
+Get-ChildItem .\skills -Directory | ForEach-Object {
+  Copy-Item -Recurse -Force $_.FullName $env:USERPROFILE\.codex\skills\
+}
+```
+
+Restart Codex after installing or updating skills so the new metadata is loaded. Keep package directory names stable because Codex uses them as part of skill discovery.
 
 ## Maintaining This Repo
 
@@ -72,6 +92,14 @@ For skill package changes, also verify:
 - Relative links and referenced files resolve.
 - Scripts are safe by default and documented from the skill or references that use them.
 
+Run the catalog validator:
+
+```powershell
+python scripts\validate_skills.py
+```
+
+GitHub Actions runs the same validation on pushes and pull requests.
+
 ## Git Workflow
 
 Use small, intentional commits. A normal change flow is:
@@ -100,3 +128,7 @@ For agent-driven changes, report:
 - validation performed
 - commit SHA, if committed
 - push target, if pushed
+
+## License
+
+MIT. See `LICENSE`.

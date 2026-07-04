@@ -9,6 +9,7 @@ Use this repository as a collection of durable agent knowledge, not as a scratch
 - `skills/<name>/scripts/`: deterministic helpers.
 - `skills/<name>/agents/`: optional metadata for agent UIs or catalogs.
 - `docs/`: collection-level operating notes.
+- `scripts/`: collection-level validation and maintenance helpers.
 
 ## Standards
 
@@ -25,6 +26,7 @@ Use this repository as a collection of durable agent knowledge, not as a scratch
 - Referenced files exist and are reachable by relative path.
 - Scripts are deterministic and safe by default.
 - The package can be copied into a Codex skills directory without depending on repository-level files.
+- `python scripts\validate_skills.py` passes from the repository root.
 
 ## Maintenance Triggers
 

@@ -20,3 +20,9 @@ skills/
 ```
 
 Use `references/`, `scripts/`, and `agents/` only when the skill needs them.
+
+Before committing, run:
+
+```powershell
+python scripts\validate_skills.py
+```
