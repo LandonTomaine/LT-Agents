@@ -39,6 +39,10 @@ ROOT_SIGNALS = [
     "README.md",
     "README",
     "AGENTS.md",
+    "CONTRIBUTING.md",
+    "LICENSE",
+    "SECURITY.md",
+    "CODE_OF_CONDUCT.md",
     ".editorconfig",
     ".gitattributes",
     ".gitignore",
@@ -64,6 +68,9 @@ ROOT_SIGNALS = [
     "ruff.toml",
     "mypy.ini",
     ".pre-commit-config.yaml",
+    ".github/dependabot.yml",
+    ".github/workflows/codeql.yml",
+    ".github/workflows/codeql.yaml",
     "go.mod",
     "Cargo.toml",
     "pom.xml",
@@ -131,6 +138,13 @@ CONFIG_NAMES = {
         "infrastructure",
     ],
     "hooks": [".husky", ".githooks", ".pre-commit-config.yaml"],
+    "security": [
+        "SECURITY.md",
+        ".github/dependabot.yml",
+        ".github/workflows/codeql.yml",
+        ".github/workflows/codeql.yaml",
+    ],
+    "public_repo": ["LICENSE", "CONTRIBUTING.md", "CODE_OF_CONDUCT.md"],
     "agent": ["AGENTS.md", "agent-rules", ".agents/skills", ".codex/skills"],
     "docs": ["docs", "doc", "documentation"],
     "tests": ["tests", "test", "__tests__", "spec"],
@@ -591,6 +605,8 @@ def collect_gaps(
     has_code_or_runtime = bool(projects or runtime_surface_hints)
     if not named_path_exists(root, "README.md") and not named_path_exists(root, "README"):
         gaps.append("No root README found.")
+    if not config_paths.get("public_repo"):
+        gaps.append("No LICENSE, CONTRIBUTING.md, or CODE_OF_CONDUCT.md found; ask if this repo will be public or shared externally.")
 
     if not has_code_or_runtime:
         gaps.append(
@@ -608,6 +624,8 @@ def collect_gaps(
         gaps.append("No common CI configuration found; treat as optional unless merge gates are in scope.")
     if not config_paths.get("hooks"):
         gaps.append("No common tracked local hook configuration found; treat as optional developer convenience.")
+    if not config_paths.get("security"):
+        gaps.append("No obvious CodeQL, Dependabot, or security policy config found; ask whether security scanning is in scope.")
     if projects and not config_paths.get("tests"):
         gaps.append("No conventional test directory found.")
     if config_paths.get("docs") and not named_path_exists(root, "docs/development/validation.md"):

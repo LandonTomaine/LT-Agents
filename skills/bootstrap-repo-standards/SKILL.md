@@ -16,6 +16,7 @@ This skill is discovery-first. Never finalize product meaning, architecture poli
 - Treat the target repo as the path named by the user, or the current working directory if no path is given.
 - Start read-only: inspect files, run safe inventory commands, and draft in chat.
 - Before broad manual inventory, run `scripts/repo_scan.py <repo>` from this skill and summarize its output. If it cannot run, report the exact blocker and then do an explicit manual fallback inventory.
+- If Python is unavailable for bundled scripts, ask whether to install Python, use another available Python launcher, or proceed with a manual fallback. Do not silently skip the scripts.
 - Do not create or modify durable repo files until the user approves an exact file/action manifest.
 - Durable files include docs, standards roadmap files, `AGENTS.md`, `agent-rules/`, `.agents/skills/`, legacy `.codex/skills/`, hook configs, CI configs, lint/format configs, tests, and scripts.
 - Ask before running commands that may write generated files, install packages, alter hooks, migrate databases, or change lockfiles.
@@ -45,6 +46,7 @@ This skill is discovery-first. Never finalize product meaning, architecture poli
 
 2. Inventory relentlessly but structurally.
    - First command after git status: `python <this-skill>/scripts/repo_scan.py <repo>` or equivalent Python launcher for the environment.
+   - If no Python launcher works, ask before installing Python or using the manual fallback.
    - Do not skip the scan because the repo looks small. The scan output drives the next search/read targets.
    - If the scan fails, capture the command, exit/failure reason, and fallback searches used.
    - Use targeted `rg --files` and `rg` searches for docs, doc maintenance guidance, standards TODOs, agent rules, skills, package managers, linters, formatters, analyzers, hooks, CI, tests, architecture tests, validation scripts, generated assets, migrations, deployment, environments, secrets patterns, runtime surfaces, local setup, local run, release/publish, and product docs.
@@ -87,6 +89,7 @@ This skill is discovery-first. Never finalize product meaning, architecture poli
    - Include `docs/development/bootstrap-checklist.md` as `create` or `update` unless the user rejects a durable checklist. It tracks what the repo already has, what is missing, what is not applicable, and what is deferred.
    - If temp tracking exists, keep the draft in `backbone-manifest.md` before writing approved final files.
    - Include quality-gate proposals: formatter, static analysis, lints, tests, architecture tests, hooks, CI, dependency/security checks, generated-file checks, and adoption phases.
+   - Include git hook install, CodeQL/security scanning, and public-repo readiness files when the repo is public, shared externally, or the user wants those gates.
    - Include repo-local skill proposals only for repeated, repo-specific workflows that docs alone do not cover.
    - Before proposing documentation maintenance docs or docs-update skills, load [references/documentation-maintenance.md](references/documentation-maintenance.md).
    - Before proposing local setup, local run, deployment, release, publish, or environment docs, load [references/operational-docs.md](references/operational-docs.md).
@@ -96,6 +99,9 @@ This skill is discovery-first. Never finalize product meaning, architecture poli
    - Before proposing placeholder files, load [references/placeholders.md](references/placeholders.md).
    - Recommend which candidate patterns to adopt, adapt, skip, or avoid based on this repo's actual stack and size.
    - For the durable bootstrap checklist, use `scripts/scaffold_backbone.py <repo> --mode draft --set bootstrap-checklist` for a draft or `--mode apply --set bootstrap-checklist` after approval, then replace generic rows with repo-specific evidence.
+   - For approved hook scaffolding, use `scripts/scaffold_backbone.py <repo> --mode draft --set git-hooks` before applying.
+   - For approved security scaffolding, use `scripts/scaffold_backbone.py <repo> --mode draft --set security`; for CodeQL, use `scripts/render_codeql_workflow.py <repo> --mode draft --language <language>` after languages are confirmed.
+   - For approved public-repo scaffolding, use `scripts/scaffold_backbone.py <repo> --mode draft --set public-repo`. Do not create `LICENSE` until the user chooses the license.
    - For standard folder/file skeletons, use `scripts/scaffold_backbone.py <repo> --mode draft --set <sets>` to create temp drafts.
    - Scaffolded `agent` files are intentionally minimal. Add doc routes and skill routes only as targeted updates when the referenced files are approved or already exist.
    - Use `--set file-backlog` only when the user chooses file-based work tracking.
@@ -196,6 +202,10 @@ If not done, ask the next highest-risk unresolved question and keep working.
 - `scaffold_backbone.py --mode draft`: writes temp draft files only.
 - `scaffold_backbone.py --mode apply`: writes durable target files. Use only after approved manifest.
 - `scaffold_backbone.py --set bootstrap-checklist`: creates the durable checklist template at `docs/development/bootstrap-checklist.md`; replace generic rows with repo evidence after creation.
+- `scaffold_backbone.py --set git-hooks`: creates hook docs, install script, and placeholder `.githooks/pre-commit`.
+- `scaffold_backbone.py --set security`: creates security docs and Dependabot config.
+- `scaffold_backbone.py --set public-repo`: creates contribution/security/public-readiness docs, but not `LICENSE`.
+- `render_codeql_workflow.py`: writes a language-specific CodeQL workflow in draft or apply mode. Use only after languages are confirmed and approved.
 - Scaffold apply mode skips existing files by default.
 - Scaffolded agent routes are minimal by design. Do not assume scaffold output is the final route map.
 - Treat scaffold "skipped existing" output as a required review list.

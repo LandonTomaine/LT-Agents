@@ -22,8 +22,13 @@ Use after the repo inventory is clear. Treat every item as a candidate, not a pr
 - `docs/development/testing/strategy.md`: test layers, when to use each, validation before merge.
 - `docs/development/validation.md`: local and deployed validation expectations by runtime surface and environment.
 - `docs/development/tooling.md`: commands, hooks, format/lint/build/test references.
+- `docs/development/git-hooks.md`: hook install command, installed hook path, fast local checks, CI mirror expectations.
 - `docs/development/workflow.md`: branch, implementation, validation, handoff flow.
+- `docs/development/security.md`: CodeQL/security scanning, dependency update policy, secrets, vulnerability handling.
 - `docs/development/documentation.md`: documentation ownership, update triggers, stale-doc prevention, and docs review expectations.
+- `CONTRIBUTING.md`: public or shared contribution workflow.
+- `SECURITY.md`: vulnerability reporting and supported versions.
+- `LICENSE`: only after the user chooses a license.
 - `docs/development/standards-roadmap.md`: optional TODO/roadmap for deferred standards and quality-gate work.
 - `docs/development/commits.md`: commit style if repo has conventions.
 - `docs/development/pull-requests.md`: PR expectations if repo uses PRs.
@@ -61,6 +66,8 @@ Use it for deferred bootstrap follow-ups such as:
 - architecture tests or source guards
 - CI and local hooks
 - dependency, vulnerability, license, or secret scanning
+- CodeQL or equivalent code scanning
+- public-repo files such as license, contribution, security, and code-of-conduct decisions
 - generated-file cleanliness checks
 - test-layer gaps
 - validation, local setup, deployment, or documentation follow-ups
@@ -120,6 +127,7 @@ Look for or propose stack-appropriate equivalents:
 - hooks: pre-commit/pre-push for fast local gates, documented as convenience not security.
 - CI: mirrors merge-protecting checks; does not rely on local hooks.
 - dependency hygiene: lockfiles, central versions, package audit, vulnerable dependency policy.
+- CodeQL: propose only after repository languages are known; use `scripts/render_codeql_workflow.py` for approved language-specific workflows.
 - secrets: ignore patterns, secret scanning, local secret setup docs.
 - migrations: generation commands, naming, generated-code exceptions, review rules.
 - deployment/runtime: environment variables, config ownership, smoke checks.
@@ -307,5 +315,31 @@ Prefer phased adoption for existing repos:
 5. Hooks/CI after commands are reliable.
 6. Stricter warnings/security/dependency gates.
 7. Repo-local skills for repeated workflows.
+
+## Git Hooks Choice
+
+Ask whether tracked local hooks should exist. Hooks are developer convenience; CI must enforce required checks.
+
+Default scaffold set when approved: `git-hooks`.
+
+The scaffold creates:
+
+- `docs/development/git-hooks.md`
+- `scripts/install_git_hooks.py`
+- `.githooks/pre-commit`
+
+Replace placeholder hook commands with approved fast checks before treating hooks as meaningful validation.
+
+## Security And Public Repo Choice
+
+Ask whether CodeQL/security scanning and public-repo files are in scope.
+
+Use:
+
+- `security` scaffold set for `docs/development/security.md` and `.github/dependabot.yml`.
+- `scripts/render_codeql_workflow.py <repo> --mode draft --language <language>` after CodeQL languages are confirmed.
+- `public-repo` scaffold set for `CONTRIBUTING.md`, `SECURITY.md`, and `docs/development/public-release.md`.
+
+Do not create `LICENSE` until the user chooses the license text or license family.
 
 For brand-new repos, draft the desired end state but still ask which gates should block work immediately.

@@ -115,6 +115,124 @@ Shared documentation for humans and agents.
     "documentation": {
         "docs/development/documentation.md": placeholder("Documentation Maintenance"),
     },
+    "git-hooks": {
+        "docs/development/git-hooks.md": """# Git Hooks
+
+Local hooks are developer convenience checks, not the only enforcement layer. CI must enforce required merge gates.
+
+## Install
+
+```bash
+python scripts/install_git_hooks.py
+```
+
+## Current Hooks
+
+- `.githooks/pre-commit`: placeholder hook. Replace with approved fast checks.
+
+## Rules
+
+- Keep hooks fast.
+- Do not require secrets or paid external services.
+- Mirror required checks in CI before treating them as merge gates.
+""",
+        "scripts/install_git_hooks.py": """#!/usr/bin/env python3
+\"\"\"Install this repo's tracked Git hooks.\"\"\"
+
+from __future__ import annotations
+
+import subprocess
+from pathlib import Path
+
+
+def main() -> int:
+    repo = Path(__file__).resolve().parents[1]
+    hooks = repo / ".githooks"
+    if not hooks.is_dir():
+        raise SystemExit(f"Missing hooks directory: {hooks}")
+    subprocess.run(["git", "config", "core.hooksPath", ".githooks"], cwd=repo, check=True)
+    print("Configured git core.hooksPath=.githooks")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+""",
+        ".githooks/pre-commit": """#!/bin/sh
+set -eu
+
+echo "No pre-commit checks configured yet. Replace .githooks/pre-commit with approved fast checks."
+""",
+    },
+    "security": {
+        "docs/development/security.md": """# Security
+
+Document approved security checks, dependency policy, secret handling, and vulnerability response.
+
+## Current Decisions
+
+- CodeQL: TODO
+- Dependency updates: TODO
+- Secret scanning: TODO
+- Vulnerability reporting: TODO
+
+## Notes
+
+- Generate CodeQL after languages are confirmed:
+
+```bash
+python <bootstrap-skill>/scripts/render_codeql_workflow.py <repo> --mode draft --language <language>
+```
+""",
+        ".github/dependabot.yml": """version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+""",
+    },
+    "public-repo": {
+        "CONTRIBUTING.md": """# Contributing
+
+Thank you for improving this project.
+
+## Workflow
+
+1. Open an issue or discuss broad changes before large rewrites.
+2. Keep changes focused.
+3. Run documented validation before submitting.
+4. Update related docs when behavior, setup, deployment, validation, or standards change.
+
+## Pull Requests
+
+- Describe what changed and why.
+- Include validation evidence.
+- Call out follow-up work or deferred checks.
+""",
+        "SECURITY.md": """# Security Policy
+
+## Reporting A Vulnerability
+
+Do not open public issues for suspected vulnerabilities. Contact the repository owner through the approved private channel.
+
+## Supported Versions
+
+This repository does not currently publish versioned releases unless stated elsewhere.
+""",
+        "docs/development/public-release.md": """# Public Repository Readiness
+
+Use this checklist before making the repository public.
+
+- License chosen and committed as `LICENSE`
+- `CONTRIBUTING.md` reviewed
+- `SECURITY.md` reviewed
+- Code of conduct decision made
+- Secret scan completed
+- Private URLs, tokens, customer data, and internal-only notes removed
+- Install instructions tested from a fresh checkout
+""",
+    },
     "bootstrap-checklist": {
         "docs/development/bootstrap-checklist.md": """# Bootstrap Checklist
 
@@ -171,6 +289,8 @@ Status values:
 | Git hooks | missing |  |  |
 | CI gates | missing |  |  |
 | Dependency, license, vulnerability, or secret checks | missing |  |  |
+| CodeQL or equivalent code scanning | missing |  |  |
+| Public repo license and contribution files | missing |  |  |
 
 ## Agent Guidance and Skills
 
