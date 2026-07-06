@@ -85,6 +85,8 @@ Ask placement and scope before proposing:
 
 If the repo has no confirmed UI, mark UI/browser validation as rejected or not applicable. Do not scaffold a placeholder UI validation skill.
 
+Use `scripts/scaffold_backbone.py <repo> --mode draft --set ui-validation-skill` only after UI/browser validation is approved. The generated skill is a starter; tailor it to the repo's run command, browser surface, auth/test data, artifact rules, and cleanup expectations before applying or treating it as authoritative.
+
 ## Manifest Requirements
 
 Every proposed validation item must include:

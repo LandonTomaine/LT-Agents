@@ -27,6 +27,8 @@ This skill is discovery-first. Never finalize product meaning, architecture poli
 - Do not call the skill done while any question ledger item or checklist item is open, ambiguous, unchecked, or assumption-only unless the user explicitly says to stop or finish anyway.
 - Use `.agents/tmp/bootstrap-repo-standards/` for temporary tracking when approved. Treat it as working state, not final documentation.
 - Prefer scripts for deterministic folder/file scaffolding. Use AI for decisions and repo-specific content, not repetitive file creation.
+- Prefer scaffolded skill and workflow templates for approved standard shapes. Do not draft long reusable skill bodies in chat when `scaffold_backbone.py` can generate them.
+- Use `scripts/copy_skill_package.py` for approved existing skill package copies. Do not hand-write reusable skill packages from memory.
 - Existing target files are source material. Read, compare, and propose updates; never replace them with skeletons.
 - Do not put TODO placeholders in always-loaded agent files. Placeholder files are allowed only for non-always-loaded docs the user approved and is likely to fill later.
 - Do not mention where a pattern came from or earlier setup work in generated repo guidance. Use evidence to choose patterns, then write target-repo guidance only.
@@ -36,12 +38,15 @@ This skill is discovery-first. Never finalize product meaning, architecture poli
 - Do not treat documentation maintenance as solved by creating docs once. Ask how docs should be updated when code, product behavior, commands, environments, or standards change.
 - Keep standards-improvement TODOs separate from product backlog unless the user explicitly wants one shared tracker.
 - Include a durable tracked bootstrap checklist in the first proposed manifest unless the user rejects it. Default path: `docs/development/bootstrap-checklist.md`.
+- Every candidate skill requires an explicit placement decision: `repo-local`, `user/global`, `ignore`, or `defer`.
+- Optional repo-local implementation, orchestration, docs-audit, docs-update, UI-validation, and source-skill-derived skills require explicit repo-fit and manifest approval.
 
 ## Workflow
 
 1. Establish scope.
    - Identify repo path, repo stage, desired outcome, and whether the user wants audit-only, proposal-only, or approved implementation after discussion.
    - Check git status and note dirty files. Do not overwrite user work.
+   - Load [references/execution-contracts.md](references/execution-contracts.md) before creating temp tracking, judging completion, or running write-mode scaffold scripts.
    - Ask to create or reuse temp tracking files under `.agents/tmp/bootstrap-repo-standards/`. If approved, run `scripts/init_tracking.py <repo>`.
 
 2. Inventory relentlessly but structurally.
@@ -58,6 +63,7 @@ This skill is discovery-first. Never finalize product meaning, architecture poli
    - Summarize what is proven by files, what is only inferred, and what is unknown.
    - Classify surfaces: product, architecture, backend, frontend, API, workers/jobs, CLI/library, data, tests, local setup/run, deployment/release, local validation, deployed validation, tooling, workflow, docs, documentation maintenance, standards roadmap, agent rules, repo-local skills, CI/hooks.
    - Load [references/backbone-checklist.md](references/backbone-checklist.md) after the repo shape is clear.
+   - Load [references/guided-implementation.md](references/guided-implementation.md) before classifying the repo as empty, docs-prefilled, code-prefilled, or active app and before recommending autonomous orchestration scaffolds.
    - Prepare durable checklist entries for `present`, `partial`, `missing`, `not applicable`, `defer`, or `rejected` status with file evidence and next steps.
 
 4. Interview before prescribing.
@@ -90,19 +96,21 @@ This skill is discovery-first. Never finalize product meaning, architecture poli
    - If temp tracking exists, keep the draft in `backbone-manifest.md` before writing approved final files.
    - Include quality-gate proposals: formatter, static analysis, lints, tests, architecture tests, hooks, CI, dependency/security checks, generated-file checks, and adoption phases.
    - Include git hook install, CodeQL/security scanning, and public-repo readiness files when the repo is public, shared externally, or the user wants those gates.
-   - Include repo-local skill proposals only for repeated, repo-specific workflows that docs alone do not cover.
+   - Include skill proposals only after a per-skill decision table shows evidence, trigger, placement, docs-vs-skill rationale, source/global equivalent, and approval status.
    - Before proposing documentation maintenance docs or docs-update skills, load [references/documentation-maintenance.md](references/documentation-maintenance.md).
    - Before proposing local setup, local run, deployment, release, publish, or environment docs, load [references/operational-docs.md](references/operational-docs.md).
    - Before proposing validation docs, validation gates, smoke checks, deployed checks, or validation skills, load [references/validation.md](references/validation.md).
    - Before proposing, ignoring, globalizing, or migrating repo-local skills, load [references/repo-local-skills.md](references/repo-local-skills.md).
    - Before proposing backlog, PRD, issue, or tracker files, load [references/work-tracking.md](references/work-tracking.md).
    - Before proposing placeholder files, load [references/placeholders.md](references/placeholders.md).
+   - Before proposing implementation, orchestration, docs-audit, docs-update, UI-validation, or source-skill-derived copies, load [references/guided-implementation.md](references/guided-implementation.md), [references/repo-local-skills.md](references/repo-local-skills.md), and [references/source-skill-patterns.md](references/source-skill-patterns.md).
    - Recommend which candidate patterns to adopt, adapt, skip, or avoid based on this repo's actual stack and size.
    - For the durable bootstrap checklist, use `scripts/scaffold_backbone.py <repo> --mode draft --set bootstrap-checklist` for a draft or `--mode apply --set bootstrap-checklist` after approval, then replace generic rows with repo-specific evidence.
    - For approved hook scaffolding, use `scripts/scaffold_backbone.py <repo> --mode draft --set git-hooks` before applying.
    - For approved security scaffolding, use `scripts/scaffold_backbone.py <repo> --mode draft --set security`; for CodeQL, use `scripts/render_codeql_workflow.py <repo> --mode draft --language <language>` after languages are confirmed.
    - For approved public-repo scaffolding, use `scripts/scaffold_backbone.py <repo> --mode draft --set public-repo`. Do not create `LICENSE` until the user chooses the license.
-   - For standard folder/file skeletons, use `scripts/scaffold_backbone.py <repo> --mode draft --set <sets>` to create temp drafts.
+   - For standard folder/file/skill skeletons, use `scripts/scaffold_backbone.py <repo> --mode draft --set <set>` with explicit approved sets. The script has no default set.
+   - For approved existing skill package copies, use `scripts/copy_skill_package.py <source-skill-dir> <repo> --mode draft` first, then `--mode apply` only after the exact target path is approved.
    - Scaffolded `agent` files are intentionally minimal. Add doc routes and skill routes only as targeted updates when the referenced files are approved or already exist.
    - Use `--set file-backlog` only when the user chooses file-based work tracking.
    - Use `--set standards-roadmap` only when the user approves a standards adoption TODO/roadmap file.
@@ -118,6 +126,7 @@ This skill is discovery-first. Never finalize product meaning, architecture poli
    - Write only approved files.
    - Create or update the durable bootstrap checklist before broader standards files so later work has a tracked ledger.
    - Prefer `scripts/scaffold_backbone.py <repo> --mode apply --set <sets>` for approved standard skeletons. Apply mode requires explicit `--set` values from the approved manifest.
+   - Use `scripts/copy_skill_package.py <source-skill-dir> <repo> --mode apply` only for approved existing skill package copies and exact target paths.
    - Use scaffold apply only for approved files that do not already exist.
    - For existing files, read current content and apply approved targeted patches.
    - For new custom repo-local skills, invoke the user's `skill-creator` and target `.agents/skills`. Use scaffold only for the approved standard starter skill or approved standard skeletons.
@@ -135,95 +144,6 @@ This skill is discovery-first. Never finalize product meaning, architecture poli
    - Stop only when the user says the skill is done, or every raised question and checklist item is resolved with no material ambiguity.
    - If completion criteria are not met, keep going: ask, discuss, revise, update ledgers, and re-check.
 
-## Temp Tracking Files
+## Execution Contracts
 
-Recommended path: `.agents/tmp/bootstrap-repo-standards/`
-
-- `session.md`: scope, status, stop rule, latest checkpoint.
-- `question-ledger.md`: every question, status, answer, source, ambiguity.
-- `evidence-map.md`: file-backed facts, inferences, unknowns.
-- `backbone-checklist.md`: candidate docs/gates/skills and decision status.
-- `backbone-manifest.md`: proposed create/update/skip actions awaiting approval.
-- `completion-checklist.md`: final stop criteria.
-- `draft-files/`: script-generated draft skeletons mirroring target paths.
-
-Rules:
-
-- Ask before first creation unless the user already approved temp tracking files.
-- Preserve existing files; append or update in place.
-- Keep entries terse.
-- Mark each question one of: `unanswered`, `answered`, `ambiguous`, `assumption candidate`, `defer`.
-- `answered` requires enough detail to write or reject a durable item without guessing.
-- `defer` requires an owner or explicit reason.
-- Mark checklist items `open`, `checked`, `rejected`, or `defer`.
-- `checked` requires evidence, user confirmation, or completed approved work.
-- Do not graduate temp files into final docs unless approved in the manifest.
-- If the repo tracks `.agents/tmp`, ask whether to ignore it before adding ignore rules.
-
-## Durable Bootstrap Checklist
-
-Default path: `docs/development/bootstrap-checklist.md`
-
-Rules:
-
-- Propose this file in the first manifest unless the user rejects it.
-- Update it after each approved bootstrap batch.
-- Include evidence paths for every `present` or `partial` item.
-- Keep future work here as standards/bootstrap follow-up, not product backlog.
-- Use [references/backbone-checklist.md](references/backbone-checklist.md) for checklist categories, statuses, and roadmap split rules.
-
-## Completion Criteria
-
-Done only when one is true:
-
-- User explicitly says this pass is done, even with remaining open items.
-- Or all are true:
-  - `question-ledger.md`: no `unanswered`, `ambiguous`, or `assumption candidate`.
-  - `backbone-checklist.md`: no `candidate` or `open`.
-  - `backbone-manifest.md`: every row is `approved`, `done`, `rejected`, or `defer`.
-  - `completion-checklist.md`: every row is `checked`, `rejected`, or `defer`.
-  - No material product, architecture, standards, tooling, docs, quality-gate, or skill ambiguity remains.
-  - Documentation maintenance and docs-update workflow expectations are found, approved for creation/update, rejected as not needed, or explicitly deferred by the user.
-  - Durable bootstrap checklist is approved and current, or explicitly rejected/deferred by the user.
-  - Standards adoption TODO/roadmap is approved, rejected, or explicitly deferred by the user.
-  - Local setup/run guidance is found, approved for creation/update, rejected as not applicable, or explicitly deferred by the user.
-  - Deployment/release guidance is found, approved for creation/update, rejected as not applicable, or explicitly deferred by the user.
-  - Local and deployed validation expectations are explicit for every confirmed runtime surface, or explicitly deferred by the user.
-  - Validation for approved changes is recorded.
-
-If not done, ask the next highest-risk unresolved question and keep working.
-
-## Script Safety
-
-- `repo_scan.py` is mandatory for the first inventory pass unless unavailable; record failure and fallback when it cannot run.
-- `repo_scan.py`: read-only.
-- `check_skill_migration.py`: read-only.
-- `init_tracking.py`: writes temp tracking files only.
-- `scaffold_backbone.py --mode draft`: writes temp draft files only.
-- `scaffold_backbone.py --mode apply`: writes durable target files. Use only after approved manifest.
-- `scaffold_backbone.py --set bootstrap-checklist`: creates the durable checklist template at `docs/development/bootstrap-checklist.md`; replace generic rows with repo evidence after creation.
-- `scaffold_backbone.py --set git-hooks`: creates hook docs, install script, and placeholder `.githooks/pre-commit`.
-- `scaffold_backbone.py --set security`: creates security docs and Dependabot config.
-- `scaffold_backbone.py --set public-repo`: creates contribution/security/public-readiness docs, but not `LICENSE`.
-- `render_codeql_workflow.py`: writes a language-specific CodeQL workflow in draft or apply mode. Use only after languages are confirmed and approved.
-- Scaffold apply mode skips existing files by default.
-- Scaffolded agent routes are minimal by design. Do not assume scaffold output is the final route map.
-- Treat scaffold "skipped existing" output as a required review list.
-- Do not use scaffold overwrite for existing guidance files. Prefer targeted patches.
-- Use scaffold overwrite only for newly generated temp drafts or exact path-level replacement approved by the user.
-- Before any write-mode script, state mode, target root, file sets, and whether durable files may be written.
-
-## Outputs
-
-Before approval:
-- scan summary
-- evidence map
-- question ledger
-- proposed backbone manifest
-- recommended adoption phases
-
-After approval:
-- changed files
-- validation results
-- remaining unanswered questions
-- next recommended batch, if any
+Load [references/execution-contracts.md](references/execution-contracts.md) when temp tracking, durable bootstrap checklist rules, completion criteria, script safety, scaffold sets, or final output shape matters.

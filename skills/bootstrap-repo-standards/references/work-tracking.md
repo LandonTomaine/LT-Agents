@@ -25,6 +25,12 @@ Candidate files:
 
 Keep file-based examples generic. Do not imply all repos need PRDs, numbered capabilities, screenshots, or workflow-state files.
 
+Approved scaffold set:
+
+- `file-backlog`: backlog index, bugs/incidents table, follow-ups table, example capability backlog, plan template, workflow-state template, and artifact folders.
+
+Replace scaffold examples with repo-specific evidence before treating them as active work. Keep plan and workflow files short enough to reload cheaply.
+
 ## External Tracker Mode
 
 Do not create a local PRD/backlog tree by default.
@@ -51,4 +57,3 @@ Candidate examples:
 - convert a file-based backlog slice into tasks
 
 Do not create the skill without approval and a clear trigger.
-

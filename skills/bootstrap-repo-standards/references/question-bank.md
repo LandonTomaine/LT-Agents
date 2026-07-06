@@ -176,7 +176,8 @@ Use this to build a question ledger after scanning the repo. Ask the questions t
 - What repeated repo workflows should become skills?
 - Which existing global skills already cover the need?
 - Which workflows are better as short shared docs instead of skills?
-- Should skills be repo-local under `.agents/skills` or global under `$HOME/.agents/skills`?
+- For each candidate skill, should placement be repo-local, user/global, ignored, or deferred?
+- Should skills be repo-local under `.agents/skills` or global/user skills from the active skill list, `$CODEX_HOME/skills`, or `$HOME/.codex/skills`?
 - If legacy `.codex/skills` exists, should it be kept, migrated to `.agents/skills`, or supported temporarily?
 - `audit-skills` reviews skills for trigger quality, brevity, DRYness, and resource placement. Should it be repo-local, user/global, ignored, or deferred for this repo?
 - `improve-ai-self` analyzes repeated agent failures or bad assumptions and turns them into updated guidance, skills, scripts, or docs. Should it be repo-local, user/global, ignored, or deferred for this repo?

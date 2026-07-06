@@ -5,7 +5,7 @@ Load when proposing, creating, auditing, or migrating repo-local skills.
 ## Paths
 
 - Preferred repo path: `.agents/skills/<skill-name>/`.
-- Preferred user path: `$HOME/.agents/skills/<skill-name>/`.
+- User/global paths: active skill list, `$CODEX_HOME/skills`, or `$HOME/.codex/skills`.
 - Legacy repo path to detect: `.codex/skills/<skill-name>/`.
 - Do not create `.codex/skills` for new bootstraps unless the user explicitly chooses that path.
 - Route repo-local skills from `agent-rules/README.md`; add a `.agents/README.md` only when the repo has a real need for that folder index.
@@ -13,11 +13,61 @@ Load when proposing, creating, auditing, or migrating repo-local skills.
 ## Creation
 
 - Create a repo-local skill only when the workflow is repo-specific, repeated, multi-step, narrow, and not covered by shared docs or global skills.
+- Ask placement for every candidate skill: `repo-local`, `user/global`, `ignore`, or `defer`.
 - Use the user's `skill-creator` for new custom skills and target `.agents/skills`.
 - The standard starter skill is `review-changed-code`; scaffold it only after approval and only if no equivalent exists.
 - Consider `update-documentation` when docs updates are repeated, repo-specific, and tied to repo routes, authoritative docs, standards, commands, product behavior, validation, or deployment rules.
 - Keep starter skills minimal when repo standards are still TODO-heavy.
 - Put heavy checklists in `references/` and deterministic helpers in `scripts/`.
+
+## Candidate Skill Decision Checklist
+
+Use one row per candidate before adding it to the manifest:
+
+| Field | Required answer |
+| --- | --- |
+| Candidate skill | Name or workflow family. |
+| Trigger | Exact task or user wording that should invoke it. |
+| Evidence | Repo files, repeated workflow, or user confirmation proving recurrence. |
+| Repo-specific inputs | Paths, commands, standards, validation, auth, deployment, routes, or tracker behavior. |
+| Why docs are not enough | Procedural complexity that justifies a skill. |
+| Existing global/source equivalent | Use global, copy shape, adapt, reference only, or skip. |
+| Placement | `repo-local`, `user/global`, `ignore`, or `defer`. |
+| Shape | scaffold set, copied package, custom skill, or no file. |
+| References/scripts needed | What keeps `SKILL.md` short and deterministic. |
+| Approval | `approved`, `rejected`, or `defer`. |
+
+Decision rules:
+
+- `repo-local`: all creation tests pass and the repo needs versioned paths, commands, standards, or team-shared behavior.
+- `user/global`: useful across repos and not materially tied to target repo files or rules.
+- `ignore`: broad, speculative, covered elsewhere, or not useful for this repo.
+- `defer`: fit, recurrence, or ownership is unresolved; record owner or trigger.
+- Docs only: the workflow is mostly policy plus a short command route.
+- No skill package can be proposed without a placement answer.
+- No placeholder skill for a deferred decision.
+
+Compact standard skill shape:
+
+- narrow trigger
+- `Primary lens`
+- optional `Invoked by` and `Delegates to`
+- short `Goal`
+- concrete `Workflow`
+- explicit `Output`
+- `Do Not` only for likely mistakes
+
+Approved standard scaffold sets:
+
+- `skills`: starter `review-changed-code`
+- `implementation-skills`: planning, implementation, plan review, and bug resolution
+- `orchestration-skill`: resumable work-plan orchestration
+- `docs-audit-skills`: standards docs audit, skill-opportunity audit, docs update
+- `ui-validation-skill`: browser validation for confirmed UI repos only
+
+Use `scripts/scaffold_backbone.py <repo> --mode draft --set <set>` for standard approved copies. Use `scripts/copy_skill_package.py <source-skill-dir> <repo> --mode draft` for approved existing package copies. Use `skill-creator` for custom repo-specific skills.
+
+When the user points to global skills or a source repo such as Cuticly, load [source-skill-patterns.md](source-skill-patterns.md). Treat those skills as side references unless the user approves a target-specific copy or adaptation.
 
 ## Standard Optional Capabilities
 
@@ -26,8 +76,12 @@ Ask whether these capabilities should be repo-local, user/global, ignored, or de
 - `audit-skills`: review skills for trigger quality, brevity, DRYness, and resource placement.
 - `improve-ai-self`: turn repeated agent failures or bad assumptions into updated guidance, skills, scripts, or docs.
 - `update-documentation`: update or propose updates to repo docs and agent routes when code, commands, product behavior, architecture, validation, deployment, or standards change.
+- `plan-implementation-work`: turn ambiguous work into a short executable task plan.
+- `implement-planned-work`: execute an approved plan through validation and review.
+- `orchestrate-work-plan`: advance approved work through a resumable task queue.
+- `resolve-bug`: reproduce, fix, and validate a concrete defect.
 
-When asking the user, include the descriptions. Do not ask with unexplained skill names.
+When asking the user about any skill candidate, include the description, placement options, and likely target path or no-file outcome. Do not ask with unexplained skill names.
 
 Use this compact shape:
 
@@ -45,8 +99,10 @@ Decision options:
 Rules:
 
 - Do not copy a global skill into the repo just because it exists.
+- Do not copy a source-repo skill just because it worked elsewhere.
 - If user/global is selected and the skill already exists globally, route or mention the capability without creating files.
 - If repo-local is selected, use `skill-creator` and tailor the skill to the target repo.
+- If copying an existing package is approved, draft it with `copy_skill_package.py`, then tailor repo-specific content before apply.
 - For `update-documentation`, tailor triggers to the repo's authoritative docs, stale-doc rules, route indexes, and review expectations.
 - If ignored, leave it out of the manifest except for a short rejected/deferred decision note.
 

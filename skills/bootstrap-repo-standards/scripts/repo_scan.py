@@ -35,6 +35,16 @@ SKIP_DIRS = {
     "target",
 }
 
+SKIP_PATH_SUFFIXES = {
+    ".agents/tmp",
+    ".agents/tmp/bootstrap-repo-standards",
+    ".codex/tmp",
+    ".codex/state",
+    ".codex/plans",
+    ".codex/workflows",
+    ".codex/workflows/artifacts",
+}
+
 ROOT_SIGNALS = [
     "README.md",
     "README",
@@ -277,9 +287,7 @@ def should_skip_dir(path: Path) -> bool:
     if path.name in SKIP_DIRS:
         return True
     normalized = path.as_posix().lower()
-    return normalized.endswith("/.agents/tmp") or normalized.endswith(
-        "/.agents/tmp/bootstrap-repo-standards"
-    )
+    return any(normalized.endswith(f"/{suffix}") for suffix in SKIP_PATH_SUFFIXES)
 
 
 def iter_files(root: Path):
@@ -369,6 +377,8 @@ def collect_runtime_surface_hints(root: Path, files: list[Path]) -> dict[str, li
         lowered = relative.lower()
         name = file_path.name.lower()
         suffix = file_path.suffix.lower()
+        if is_planning_or_historical_doc(root, file_path):
+            continue
 
         if name in deployment_names or lowered.startswith((
             ".cloudflare/",
@@ -552,6 +562,13 @@ def collect_doc_files(root: Path, files: list[Path]) -> list[str]:
     return docs[:200]
 
 
+def is_planning_or_historical_doc(root: Path, file_path: Path) -> bool:
+    if file_path.suffix.lower() not in {".md", ".mdx", ".txt", ".rst"}:
+        return False
+    parts = [part.lower() for part in file_path.relative_to(root).parts]
+    return bool({"backlog", "drafts", "history"} & set(parts))
+
+
 def is_doc_like(root: Path, file_path: Path) -> bool:
     relative = file_path.relative_to(root)
     parts = {part.lower() for part in relative.parts}
@@ -564,6 +581,38 @@ def is_doc_like(root: Path, file_path: Path) -> bool:
     }
 
 
+def is_operational_doc_candidate(root: Path, file_path: Path) -> bool:
+    if not is_doc_like(root, file_path):
+        return False
+
+    relative = file_path.relative_to(root)
+    parts = [part.lower() for part in relative.parts]
+    if parts[0] in {"agent-rules", ".agents", ".codex"}:
+        return False
+    if "backlog" in parts or "drafts" in parts or "history" in parts:
+        return False
+    if len(parts) == 1 and parts[0] in {"readme.md", "readme.txt", "contributing.md"}:
+        return True
+    if parts[0] not in {"docs", "doc", "documentation"}:
+        return False
+    return any(
+        part in {
+            "development",
+            "develop",
+            "dev",
+            "operations",
+            "ops",
+            "deployment",
+            "deploy",
+            "runbooks",
+            "runbook",
+            "testing",
+            "architecture",
+        }
+        for part in parts
+    ) or file_path.name.lower() in {"readme.md", "index.md"}
+
+
 def collect_operational_doc_hints(root: Path, files: list[Path]) -> dict[str, list[str]]:
     hints: dict[str, list[str]] = {
         "local_setup": [],
@@ -572,7 +621,7 @@ def collect_operational_doc_hints(root: Path, files: list[Path]) -> dict[str, li
         "standards_roadmap": [],
     }
     for file_path in files:
-        if not is_doc_like(root, file_path):
+        if not is_operational_doc_candidate(root, file_path):
             continue
         try:
             if file_path.stat().st_size > 300_000:

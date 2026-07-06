@@ -2,12 +2,46 @@
 
 This directory contains self-contained Codex skill packages.
 
-## Available Skills
+## Bootstrapper Quickstart
 
-- [`audit-docs`](audit-docs/SKILL.md): Lightweight documentation audit workflow for repo docs and indexes.
-- [`audit-skills`](audit-skills/SKILL.md): Skill audit workflow for trigger quality, brevity, DRYness, and resource placement.
-- [`bootstrap-repo-standards`](bootstrap-repo-standards/SKILL.md): Repository standards bootstrapping workflow with references and helper scripts.
-- [`ship-change`](ship-change/SKILL.md): Lightweight end-to-end change workflow with approval before commit and push.
+Install:
+
+```text
+$skill-installer install https://github.com/LandonTomaine/LT-Agents/tree/main/skills/bootstrap-repo-standards
+```
+
+Restart Codex.
+
+Run from the target repo:
+
+```text
+Use $bootstrap-repo-standards to bootstrap this repo.
+```
+
+## Public Skill Packages
+
+Each direct child directory is a raw installable skill package for local use with `$skill-installer`. Nested `references/`, `scripts/`, and `agents/` folders are package internals.
+
+| Skill | Purpose | Prerequisites |
+| --- | --- | --- |
+| [`audit-docs`](audit-docs/SKILL.md) | Review documentation systems for drift, duplication, missing routes, and unclear maintenance rules. | Git and `rg` recommended. |
+| [`audit-skills`](audit-skills/SKILL.md) | Review skills for trigger quality, brevity, DRYness, and resource placement. | Git and `rg` recommended. |
+| [`bootstrap-repo-standards`](bootstrap-repo-standards/SKILL.md) | Bootstrap or overhaul repo standards through scan, interview, checklist, manifest approval, docs, validation, quality gates, and repo-local skill decisions. | Python 3 required for bundled scripts; Git and `rg` recommended. |
+| [`ship-change`](ship-change/SKILL.md) | Implement a repo change end to end, validate it, and commit/push only after approval. | Git required for commit/push; repo validation commands as documented by the target repo. |
+
+Install from GitHub with:
+
+```text
+$skill-installer install https://github.com/LandonTomaine/LT-Agents/tree/main/skills/<skill-name>
+```
+
+Then invoke with `$<skill-name>`, for example:
+
+```text
+Use $bootstrap-repo-standards to bootstrap this repo.
+```
+
+For broad public distribution, prefer packaging these skills as Codex plugins. Raw skill folders are still useful for local installation, testing, and private sharing.
 
 ## Adding Skills
 

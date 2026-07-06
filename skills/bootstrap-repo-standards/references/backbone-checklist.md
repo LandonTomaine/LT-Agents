@@ -6,6 +6,7 @@ Use after the repo inventory is clear. Treat every item as a candidate, not a pr
 
 - `README.md`: human repo entrypoint, setup pointer, repo shape, next-read links.
 - `AGENTS.md`: tiny agent entrypoint, not a standards manual.
+- `CLAUDE.md`: optional tiny redirect to `AGENTS.md`, only when the repo wants a Claude entrypoint.
 - `agent-rules/README.md`: routing index, always-load list, task-to-doc routes, repo-local skill inventory.
 - `agent-rules/core.md`: agent behavior that is always true in this repo.
 - `agent-rules/communication-style.md`: repo-specific user-facing style, only if different from global norms.
@@ -35,6 +36,7 @@ Use after the repo inventory is clear. Treat every item as a candidate, not a pr
 - `docs/product/`: only after product interview or strong existing product docs.
 - `docs/development/work-tracking.md`: generic TODO placeholder only when external tracker workflow is selected but not yet defined.
 - `docs/backlog/`: only if this repo uses file-based planning/backlog files.
+- file-based plan/workflow templates: only when file-based orchestration is approved.
 
 Keep indexes as maps. Put actual policy in focused docs. Prefer shared docs over agent-only docs unless the guidance is purely agent behavior. For mostly agent-read files, use terse bullets/fragments over prose.
 
@@ -193,23 +195,17 @@ Stack examples:
 
 ## Repo-Local Skill Candidates
 
-Preferred repo-local skill path: `.agents/skills`. Detect `.codex/skills` as legacy or existing repo evidence and offer migration, but do not create new skills there by default.
-
-Create a repo-local skill only when the workflow is:
-
-- repo-specific
-- repeated
-- multi-step enough that docs alone are weak
-- narrow enough for a clear trigger
-- not already covered by global skills, agent rules, or shared docs
+Load `references/repo-local-skills.md` before proposing, creating, copying, globalizing, ignoring, deferring, or migrating skills.
 
 Common candidates:
 
 - review changed code against repo standards
-- update documentation when code, commands, product behavior, architecture, validation, deployment, or standards change
 - plan implementation work
 - implement approved plan
-- resolve bug/regression
+- review implementation plan before coding
+- orchestrate a work plan through task queue, validation, review, and handoff
+- resolve bug or regression
+- update documentation when code, commands, product behavior, architecture, validation, deployment, or standards change
 - validate UI in browser, only when the repo has a confirmed UI
 - validate API smoke checks, only when the repo has a confirmed API
 - validate CLI/package behavior, only when the repo has a confirmed CLI or library/package workflow
@@ -221,60 +217,16 @@ Common candidates:
 - plan architecture cleanup
 
 Reject broad "do everything in this repo" skills. Prefer focused skills with references or scripts for the detailed parts.
-
-If skill scaffolding is approved and no equivalent exists, create a minimal `review-changed-code` starter skill first. Use `skill-creator` for custom skills.
-
-Ask placement for optional `audit-skills` and `improve-ai-self` capabilities. Include what each does when asking the user:
-
-- `audit-skills`: reviews skills for trigger quality, brevity, DRYness, and resource placement.
-- `improve-ai-self`: analyzes repeated agent failures or bad assumptions and turns them into updated guidance, skills, scripts, or docs.
-
-Placement options:
-
-- repo-local under `.agents/skills`
-- user/global
-- ignored
-- deferred
-
-Prefer user/global when the capability is not target-repo-specific. Prefer repo-local only when team-shared repo standards or paths materially change the workflow.
+Require a per-skill decision row with evidence, trigger, placement, creation method, and approval status. Source/global skill comparisons must use `references/source-skill-patterns.md`.
 
 ## Validation Choice
 
 Load `references/validation.md` before resolving this section.
-
-Ask relentlessly until every confirmed runtime surface has a local validation answer and every deployed environment has a deployed validation answer. If the user explicitly says to figure it out later, mark the item `defer` with owner and next step; otherwise keep asking.
-
-Confirm runtime surfaces first:
-
-- UI/web pages
-- HTTP API
-- CLI
-- library/package
-- worker/job/scheduler
-- migrations/data jobs
-- external integrations
-- infrastructure/deployment-only repo
-
-Validation docs:
-
-- Prefer `docs/development/testing/strategy.md` for test layers and commands.
-- Prefer `docs/development/validation.md` for local/deployed proof, environment-specific smoke checks, manual checks, test accounts, credentials assumptions, and completion evidence.
-- Do not put validation TODOs in always-loaded agent files.
-
-Validation skills:
-
-- Propose a skill only when the workflow is repeated, repo-specific, and too procedural for a short doc.
-- Reject or skip UI/browser validation when no UI is confirmed.
-- Ask whether the skill should be repo-local, user/global, ignored, or deferred.
+Every confirmed runtime surface needs local validation. Every deployed environment needs deployed validation, or an explicit `defer` with owner and next step.
 
 ## Work Tracking Choice
 
-Ask before creating backlog files.
-
-- File-based: create approved PRD/backlog examples and routes.
-- External tracker: create only `docs/development/work-tracking.md` as a TODO placeholder unless the user approves more.
-- None: skip backlog/work-tracking scaffolding.
-- Defer: record the open decision in the ledger and avoid pretending a workflow exists.
+Load `references/work-tracking.md` before proposing PRD, backlog, issue, tracker, plan, or workflow-state files. Ask for `file-based`, `external-tracker`, `none`, or `defer` before creating backlog files.
 
 ## Product Documentation Gate
 

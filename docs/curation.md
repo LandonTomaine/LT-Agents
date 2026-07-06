@@ -11,6 +11,10 @@ Use this repository as a collection of durable agent knowledge, not as a scratch
 - `docs/`: collection-level operating notes.
 - `scripts/`: collection-level validation and maintenance helpers.
 
+Only direct children of `skills/` are raw installable skill packages. Nested `references/`, `scripts/`, and `agents/` folders belong to their parent package.
+
+For broad public distribution, prefer a Codex plugin with `.codex-plugin/plugin.json`. Use raw skill-folder install docs for local testing, private sharing, or early public catalogs.
+
 ## Standards
 
 - Prefer small, explicit files over large manuals.
@@ -46,5 +50,7 @@ When a skill changes, check:
 - scripts are still safe for their advertised mode
 - examples do not depend on private local paths unless that is intentional for this private repo
 - `README.md` and `skills/README.md` still route humans to the right package
+- public install instructions still list every direct `skills/<name>/` package and no package internals
+- public distribution language distinguishes raw skill-folder install from plugin packaging
 
 Stale or conflicting guidance should be fixed at the narrowest useful level. Prefer updating the authoritative doc and routing to it over duplicating the same rule in multiple files.

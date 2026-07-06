@@ -27,6 +27,15 @@ SKIP_DIRS = {
     "__pycache__",
 }
 
+SKIP_PATH_SUFFIXES = {
+    ".agents/tmp",
+    ".agents/tmp/bootstrap-repo-standards",
+    ".codex/tmp",
+    ".codex/state",
+    ".codex/plans",
+    ".codex/workflows",
+}
+
 TEXT_SUFFIXES = {
     ".md",
     ".mdx",
@@ -48,9 +57,7 @@ def should_skip_dir(path: Path) -> bool:
     if path.name in SKIP_DIRS:
         return True
     normalized = path.as_posix().lower()
-    return normalized.endswith("/.agents/tmp") or normalized.endswith(
-        "/.agents/tmp/bootstrap-repo-standards"
-    )
+    return any(normalized.endswith(f"/{suffix}") for suffix in SKIP_PATH_SUFFIXES)
 
 
 def iter_files(root: Path):
