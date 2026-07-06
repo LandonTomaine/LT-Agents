@@ -1,6 +1,6 @@
 # LT Agents
 
-Private catalog of reusable Codex skills, agent instructions, references, and maintenance notes.
+Public catalog of reusable Codex skills, agent instructions, references, and maintenance notes.
 
 This repository is organized as a durable home for reusable agent knowledge. Each skill is kept as a self-contained package under `skills/`, with repository-level docs used only for indexing, contribution rules, and collection-wide conventions.
 
@@ -187,7 +187,7 @@ Guidelines:
 - Review `git diff` before staging.
 - Use clear commit messages that name the changed skill or repo guidance.
 - Keep copied upstream/global skill updates separate from local repo curation changes when practical.
-- Push to `origin/main` for normal private-repo updates unless a larger change needs review on a branch first.
+- Push to `origin/main` for normal catalog updates unless a larger change needs review on a branch first.
 - Use a branch for broad rewrites, new multi-file skills, migrations, or anything that should be reviewed before landing on `main`.
 - Do not rewrite published history unless explicitly approved.
 

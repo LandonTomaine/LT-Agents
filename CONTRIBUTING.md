@@ -47,4 +47,4 @@ Examples:
 - `Tighten bootstrap standards workflow`
 - `Document skill install workflow`
 
-Push to `origin/main` for normal private catalog updates. Use a branch for broad rewrites, new multi-file skills, or changes that need review first.
+Push to `origin/main` for normal catalog updates. Use a branch for broad rewrites, new multi-file skills, or changes that need review first.

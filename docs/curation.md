@@ -21,7 +21,7 @@ For broad public distribution, prefer a Codex plugin with `.codex-plugin/plugin.
 - Keep trigger descriptions concrete enough that Codex can decide when to load the skill.
 - Move detailed variants, checklists, and templates out of `SKILL.md` into references.
 - Use scripts for repeatable filesystem work instead of asking an agent to retype boilerplate.
-- Keep private assumptions out of reusable instructions unless the repository is explicitly private and the assumption is meant to be reused.
+- Keep private assumptions out of reusable instructions.
 
 ## Review Checklist
 
@@ -48,7 +48,7 @@ When a skill changes, check:
 - trigger text still describes when to use the skill
 - references are linked only when they should be loaded
 - scripts are still safe for their advertised mode
-- examples do not depend on private local paths unless that is intentional for this private repo
+- examples do not depend on private local paths
 - `README.md` and `skills/README.md` still route humans to the right package
 - public install instructions still list every direct `skills/<name>/` package and no package internals
 - public distribution language distinguishes raw skill-folder install from plugin packaging
