@@ -39,7 +39,7 @@ Bias hard toward brevity. Keep only wording that changes behavior, routing, or r
 6. Audit for progressive disclosure.
    - Keep core workflow guidance in `SKILL.md`.
    - Move details, examples, and checklists to nearby `references/`.
-   - Prefer `scripts/` for repeatable deterministic helpers.
+   - Move repeatable deterministic work to `scripts/` instead of spending tokens on long instructions.
 
 7. Verify before calling something redundant.
    - Point to where the duplicated guidance already lives.

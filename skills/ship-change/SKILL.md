@@ -28,6 +28,7 @@ Move a repo request from intent to delivered local changes with minimal ceremony
    - Keep edits scoped to the request.
    - Do not revert unrelated user changes.
    - Update docs or indexes when the change affects user or agent workflow.
+   - Use or add a script only when it removes repeated deterministic work.
 
 4. Validate.
    - Run the repo's documented checks for the changed surface.

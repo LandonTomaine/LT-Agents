@@ -93,7 +93,7 @@ Use this compact shape for generated or adapted repo-local skills:
 - explicit `Output`
 - `Do Not` only for likely mistakes
 
-Put long checklists in `references/`. Put deterministic helpers in `scripts/`.
+Put long checklists in `references/`. Put repeatable deterministic work in `scripts/`.
 
 ## Scaffold Set Use
 

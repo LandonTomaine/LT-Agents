@@ -28,6 +28,7 @@ Review docs as a navigable system. Find drift, duplication, missing routes, and 
    - Can a new human find the right next doc?
    - Can an agent find the right rule without loading unrelated material?
    - Are install, validation, commit, push, and publishing expectations clear when relevant?
+   - Are repeated command sequences better as scripts than prose?
    - Are skill package routes current?
    - Are maintenance triggers documented?
 

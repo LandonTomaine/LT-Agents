@@ -25,7 +25,7 @@ Discovery first. Do not finalize product meaning, architecture policy, coding st
 - Keep non-agent docs useful to humans and agent docs short. Prefer routes, focused files, and terse directives over manuals.
 - Do not call the skill done while material questions, checklist items, or validation decisions remain open unless the user explicitly accepts that stop point.
 - Use `.agents/tmp/bootstrap-repo-standards/` only as approved working state, never as final documentation.
-- Prefer scripts for deterministic folder/file scaffolding. Use AI for decisions and repo-specific content, not repetitive file creation.
+- Prefer scripts for repeatable deterministic work. Use AI for decisions and repo-specific content, not repetitive commands or file churn.
 - Use `scripts/scaffold_backbone.py` for approved standard shapes and `scripts/copy_skill_package.py` for approved source skill copies.
 - Do not hand-write reusable skill packages from memory.
 - Do not put TODO placeholders in always-loaded agent files.

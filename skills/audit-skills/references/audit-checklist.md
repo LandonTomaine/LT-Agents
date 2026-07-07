@@ -27,7 +27,7 @@ Use only the sections relevant to the current audit.
 
 - Does `SKILL.md` keep only the core workflow and decision rules?
 - Should detailed examples, checklists, or domain notes move into `references/`?
-- Should repeatable commands or deterministic helpers move into `scripts/`?
+- Should repeatable deterministic work move into `scripts/` to avoid token-heavy instructions?
 - Are references one level deep and clearly linked from `SKILL.md`?
 
 ## Resource Placement

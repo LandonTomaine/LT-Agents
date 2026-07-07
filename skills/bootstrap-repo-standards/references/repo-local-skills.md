@@ -18,7 +18,7 @@ Load when proposing, creating, auditing, or migrating repo-local skills.
 - The standard starter skill is `review-changed-code`; scaffold it only after approval and only if no equivalent exists.
 - Consider `update-documentation` when docs updates are repeated, repo-specific, and tied to repo routes, authoritative docs, standards, commands, product behavior, validation, or deployment rules.
 - Keep starter skills minimal when repo standards are still TODO-heavy.
-- Put heavy checklists in `references/` and deterministic helpers in `scripts/`.
+- Put heavy checklists in `references/` and repeatable deterministic work in `scripts/`.
 - Default to the smallest useful unit. Do not propose a whole skill suite when one focused skill or one route doc would cover the need.
 
 ## Candidate Skill Decision Checklist
