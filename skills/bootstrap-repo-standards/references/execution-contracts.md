@@ -69,6 +69,7 @@ If not done, ask the next highest-risk unresolved question and keep working.
 - `copy_skill_package.py --mode apply`: copies an approved source skill package into the durable target path. Use only after approved manifest.
 - `render_codeql_workflow.py`: writes a language-specific CodeQL workflow in draft or apply mode. Use only after languages are confirmed and approved.
 - Scaffold apply mode skips existing files by default.
+- `scaffold_backbone.py --only <path-or-glob>` limits selected sets to exact relative paths, glob matches, or a single path part such as a skill folder name.
 - Skill package copy mode skips existing files by default and must report target conflicts.
 - Scaffolded agent routes are minimal by design. Do not assume scaffold output is the final route map.
 - Treat scaffold `skipped existing` output as a required review list.
@@ -84,11 +85,13 @@ Common scaffold sets:
 - `bootstrap-checklist`: durable standards bootstrap ledger.
 - `file-backlog`: file-based backlog, follow-up, bug, plan, and workflow templates.
 - `skills`: starter `review-changed-code`.
-- `implementation-skills`: plan, implement, plan-review, and bug-resolution skills.
+- `implementation-skills`: separate plan, implement, plan-review, and bug-resolution skills.
 - `orchestration-skill`: resumable work-plan orchestration.
-- `docs-audit-skills`: standards-doc audit, skill-opportunity audit, and docs-update skills.
+- `docs-audit-skills`: separate standards-doc audit, skill-opportunity audit, and docs-update skills.
 - `ui-validation-skill`: browser validation starter for confirmed UI repos.
 - `git-hooks`, `security`, `public-repo`, `product`, `work-tracking`, `standards-roadmap`, `backend`, `frontend`, `documentation`: specialized approved sets.
+
+Set names are script conveniences. Approve each generated skill by trigger, placement, and target path before apply. Use `--only` when only part of a set is approved.
 
 Use `copy_skill_package.py` instead of scaffold sets only when the user approved copying or adapting a concrete existing skill package.
 

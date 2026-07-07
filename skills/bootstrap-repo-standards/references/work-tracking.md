@@ -25,6 +25,12 @@ Candidate files:
 
 Keep file-based examples generic. Do not imply all repos need PRDs, numbered capabilities, screenshots, or workflow-state files.
 
+Optional communication docs:
+
+- Create "what is next", release preview, roadmap, or stakeholder handoff docs only when communication planning is in scope.
+- Keep communication docs separate from executable backlog, tracker, and workflow state.
+- Do not expose internal backlog IDs, agent workflow terms, or implementation sequencing in user-facing copy unless explicitly approved.
+
 Approved scaffold set:
 
 - `file-backlog`: backlog index, bugs/incidents table, follow-ups table, example capability backlog, plan template, workflow-state template, and artifact folders.

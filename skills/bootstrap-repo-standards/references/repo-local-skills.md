@@ -19,6 +19,7 @@ Load when proposing, creating, auditing, or migrating repo-local skills.
 - Consider `update-documentation` when docs updates are repeated, repo-specific, and tied to repo routes, authoritative docs, standards, commands, product behavior, validation, or deployment rules.
 - Keep starter skills minimal when repo standards are still TODO-heavy.
 - Put heavy checklists in `references/` and deterministic helpers in `scripts/`.
+- Default to the smallest useful unit. Do not propose a whole skill suite when one focused skill or one route doc would cover the need.
 
 ## Candidate Skill Decision Checklist
 
@@ -57,29 +58,42 @@ Compact standard skill shape:
 - explicit `Output`
 - `Do Not` only for likely mistakes
 
-Approved standard scaffold sets:
+Standard scaffold sets:
 
 - `skills`: starter `review-changed-code`
-- `implementation-skills`: planning, implementation, plan review, and bug resolution
+- `implementation-skills`: separate planning, implementation, plan review, and bug resolution skills
 - `orchestration-skill`: resumable work-plan orchestration
-- `docs-audit-skills`: standards docs audit, skill-opportunity audit, docs update
+- `docs-audit-skills`: separate standards docs audit, skill-opportunity audit, and docs update skills
 - `ui-validation-skill`: browser validation for confirmed UI repos only
 
-Use `scripts/scaffold_backbone.py <repo> --mode draft --set <set>` for standard approved copies. Use `scripts/copy_skill_package.py <source-skill-dir> <repo> --mode draft` for approved existing package copies. Use `skill-creator` for custom repo-specific skills.
+Use `scripts/scaffold_backbone.py <repo> --mode draft --set <set> --only <path-or-skill-folder>` for individual approved draft candidates. Omit `--only` only when every generated file in the set is approved.
+
+Use `scripts/copy_skill_package.py <source-skill-dir> <repo> --mode draft` for approved existing package copies. Use `skill-creator` for custom repo-specific skills.
 
 When the user points to global skills or a source repo such as Cuticly, load [source-skill-patterns.md](source-skill-patterns.md). Treat those skills as side references unless the user approves a target-specific copy or adaptation.
+
+When adapting a source skill:
+
+- copy the compact contract, not the whole operating system
+- preserve narrow boundaries like intake, review, planning, implementation, and orchestration instead of recombining them
+- drop source-repo product language, tracker assumptions, personas, and environment details
+- split oversized source workflows into smaller repo-local skills or docs when that fits the target better
 
 ## Standard Optional Capabilities
 
 Ask whether these capabilities should be repo-local, user/global, ignored, or deferred:
 
+- `triage-work-intake`: capture and route incoming work without planning or implementing it.
+- `pick-next-work-item`: choose one next work target from an approved tracker or backlog.
 - `audit-skills`: review skills for trigger quality, brevity, DRYness, and resource placement.
 - `improve-ai-self`: turn repeated agent failures or bad assumptions into updated guidance, skills, scripts, or docs.
 - `update-documentation`: update or propose updates to repo docs and agent routes when code, commands, product behavior, architecture, validation, deployment, or standards change.
 - `plan-implementation-work`: turn ambiguous work into a short executable task plan.
+- `review-implementation-plan`: review a plan before coding.
 - `implement-planned-work`: execute an approved plan through validation and review.
 - `orchestrate-work-plan`: advance approved work through a resumable task queue.
 - `resolve-bug`: reproduce, fix, and validate a concrete defect.
+- `review-changed-code`: review the current diff only.
 
 When asking the user about any skill candidate, include the description, placement options, and likely target path or no-file outcome. Do not ask with unexplained skill names.
 
@@ -100,9 +114,11 @@ Rules:
 
 - Do not copy a global skill into the repo just because it exists.
 - Do not copy a source-repo skill just because it worked elsewhere.
+- Do not combine intake, selection, planning, implementation, and review into one generated skill unless the user explicitly wants a single orchestrator.
 - If user/global is selected and the skill already exists globally, route or mention the capability without creating files.
 - If repo-local is selected, use `skill-creator` and tailor the skill to the target repo.
 - If copying an existing package is approved, draft it with `copy_skill_package.py`, then tailor repo-specific content before apply.
+- Prefer one copied or generated skill at a time. Add the next one only after the first proves useful.
 - For `update-documentation`, tailor triggers to the repo's authoritative docs, stale-doc rules, route indexes, and review expectations.
 - If ignored, leave it out of the manifest except for a short rejected/deferred decision note.
 

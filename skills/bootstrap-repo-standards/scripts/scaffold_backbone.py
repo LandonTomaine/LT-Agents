@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+from fnmatch import fnmatch
 from pathlib import Path
 
 
@@ -470,33 +471,41 @@ None
     "skills": {
         ".agents/skills/review-changed-code/SKILL.md": """---
 name: review-changed-code
-description: Review the current code changes against this repo's standards and directly related context. Use when the user asks for a code review, changed-code review, PR review, or reviewer pass on in-flight edits.
+description: Review the current code changes against this repo's standards and directly related context. Use when the user asks for a code review, PR review, changed-code review, diff review, or reviewer pass on in-flight edits. This skill reviews current changes only.
 ---
 
 # Review Changed Code
 
 Primary lens: `Review`.
 
+Invoked by: implement-planned-work, resolve-bug, orchestrate-work-plan, user directly. Delegates to: none.
+
 ## Goal
 
-Review the current diff against this repo's documented standards and nearby code patterns.
+Review the current diff and only the minimum surrounding context needed to judge it.
 
 ## Workflow
 
-1. Read `AGENTS.md`, then the routed docs needed for the changed area.
-2. Inspect the diff and only the directly related context needed to judge it.
-3. Prioritize bugs, regressions, architecture or standards violations, and missing validation.
-4. Do not turn this into a whole-repo audit unless the user asks.
+1. Load only the standards docs needed for the changed area.
+2. Review the diff and directly related code.
+3. Use validation output if provided; note missing validation as a gap.
+4. Prioritize bugs, regressions, standards violations, risky dependency changes, and missing tests.
+5. Do not edit files unless the user explicitly changes the role from reviewer to implementer.
 
 ## Output
 
-Return findings first, ordered by severity:
+Return findings first, ordered by impact:
 
-- `[high|medium|low] file:line - finding`
+- `[Blocking|Non-blocking] file:line - finding`
 - `Why it matters: <short impact>`
-- `Blocking: yes|no`
+- `Verdict: Pass|Fail`
 
 If there are no findings, say so and note any validation gaps.
+
+## Do Not
+
+- Do not turn this into a repo-wide audit.
+- Do not manufacture findings.
 """,
         ".agents/skills/review-changed-code/agents/openai.yaml": """interface:
   display_name: "Review Changed Code"
@@ -507,12 +516,14 @@ If there are no findings, say so and note any validation gaps.
     "implementation-skills": {
         ".agents/skills/plan-implementation-work/SKILL.md": """---
 name: plan-implementation-work
-description: Plan a story, bug, task, feature, repo change, or implementation request before coding. Use when Codex should clarify ambiguity, inspect relevant context, and produce an implementation-ready task list.
+description: Plan a user story, bug, task, feature, repo change, or implementation request before coding. Use when Codex should clarify ambiguity, inspect relevant repo context, and produce an implementation-ready task list.
 ---
 
 # Plan Implementation Work
 
 Primary lens: `Implementation`.
+
+Invoked by: orchestrate-work-plan, resolve-bug, user directly. Delegates to: none.
 
 ## Goal
 
@@ -523,20 +534,20 @@ Blocking questions are a stop condition, not a plan section.
 ## Workflow
 
 1. Clarify outcome, constraints, non-goals, acceptance, and risk.
-2. Read `AGENTS.md`, routed docs, supplied plans/issues, and nearby code patterns.
-3. Inspect only the files needed to plan accurately.
-4. Break work into 3-7 ordered tasks unless the scope proves larger.
-5. Name files/areas, dependencies, parallel potential, and validation per task.
-6. Add technical notes only when they prevent a likely mistake.
-7. Present the draft plan in chat before writing durable plan files.
+2. Use supplied issue, tracker, backlog, PRD, or artifacts before loading extra docs.
+3. Read nearby patterns for each affected area.
+4. Inspect only enough code to plan accurately.
+5. Break work into small ordered tasks, usually 3-7.
+6. Name files/areas, dependencies, parallel potential, and validation per task.
+7. Add technical detail only when it prevents a likely mistake.
+8. Present the draft plan in chat before writing durable plan files.
 
 ## Output
-
-Use short bullets:
 
 - `Goal`
 - `Scope`: `In` and `Out`
 - `Acceptance`
+- `Execution Tier`, if the repo defines tiers
 - `Assumptions`, only if useful
 - `Tasks`: `[Tn]`, `Files/Areas`, `Depends on`, `Parallel`, `Validation`
 - `Review`
@@ -544,6 +555,11 @@ Use short bullets:
 - `Leftovers`, only if useful
 
 Do not include an `Open Questions` section in a completed plan.
+
+## Do Not
+
+- Do not hide blocking questions inside the plan.
+- Do not over-plan internals that should be discovered during implementation.
 """,
         ".agents/skills/plan-implementation-work/agents/openai.yaml": """interface:
   display_name: "Plan Implementation Work"
@@ -552,47 +568,57 @@ Do not include an `Open Questions` section in a completed plan.
 """,
         ".agents/skills/implement-planned-work/SKILL.md": """---
 name: implement-planned-work
-description: Implement a technical plan from chat, a file, an issue, a tracker item, or prior planning output. Use when Codex should execute planned work end to end in the current repo.
+description: Execute an approved plan or low-context handoff packet in the current repo. Use when Codex should make scoped code/docs changes, run required validation, record the result, and leave orchestration state to the caller when delegated.
 ---
 
 # Implement Planned Work
 
 Primary lens: `Implementation`.
 
-Delegates to: `review-changed-code`; validation skills when approved for this repo.
+Invoked by: orchestrate-work-plan, resolve-bug, user directly. Delegates to: review-changed-code and approved validation/docs skills.
 
 ## Goal
 
-Execute a provided plan while preserving scope, following repo standards, validating the result, and reviewing changed code before completion.
+Execute the supplied plan or handoff packet. Do not re-plan broad scope.
 
-The plan is the source of truth. Repo docs still govern architecture, style, workflow, validation, commits, PRs, and tracker behavior.
+Source of truth:
 
-## Workflow
+- approved plan or handoff packet
+- repo docs and directly relevant standards
+- local code and tests
 
-1. Resolve the plan source.
-   - Inline chat, local file, tracker item, issue, or PR comment.
-   - Stop for one focused question if the source is missing or ambiguous.
-2. Check the worktree.
-   - Inspect `git status`.
-   - Read overlapping modified files and work with those changes.
-3. Build an execution checklist from acceptance, tasks, assumptions, review, validation, and leftovers.
-4. Implement task by task.
-   - Follow existing patterns.
-   - Keep edits scoped.
-   - Update docs only when the plan or repo rules require it.
-5. Validate continuously.
-   - Run the cheapest meaningful checks first.
-   - Run final validation from the plan or repo validation docs.
-   - Record exact blockers when validation cannot run.
-6. Run `review-changed-code` for non-trivial or workflow-owned changes before completion.
-7. Update durable state, tracker notes, commits, or PRs only when the plan, repo workflow, or user request calls for it.
+## Resolve Input
+
+Accept:
+
+- inline approved plan
+- plan file
+- tracker/issue/PR comment that contains or links an executable plan
+- workflow/source item with a clear selected task
+- low-context handoff packet from an orchestrator
+
+If the plan is missing risk choices, unclear scope, or unresolved validation, stop for planning instead of inventing them.
+
+## Execute
+
+1. Check `git status --short --branch`.
+2. Read overlapping modified files before editing.
+3. Build a short checklist from acceptance, tasks, scope, and validation.
+4. Implement only the approved scope.
+5. Add/update tests at the layer named by the plan when practical.
+6. Update docs only when the plan, changed behavior, or repo rules require it.
+7. Run required validation.
+8. Run `review-changed-code` when the plan, tier, or risk requires it.
+9. Write or return the result artifact requested by the caller.
+
+Leave backlog, workflow, cursor, tracker, commit, and PR state to the orchestrator unless explicitly delegated.
 
 ## Completion Report
 
-- tasks implemented
+- tasks completed
 - files changed
-- validation run and result
-- review findings addressed or remaining
+- validation commands/results
+- review result or deferred reason
 - skipped validation or residual risk
 - commit, PR, branch, or tracker updates only if performed
 
@@ -605,34 +631,43 @@ Do not mark work complete when required tasks, blocking review findings, or in-s
 """,
         ".agents/skills/review-implementation-plan/SKILL.md": """---
 name: review-implementation-plan
-description: Review an implementation plan before coding for scope, task order, architecture fit, validation, unresolved ambiguity, and handoff clarity.
+description: Review an implementation plan before coding for scope, task order, architecture fit, validation, unresolved ambiguity, and handoff clarity. Use when the execution tier, workflow gate, or user requires plan review.
 ---
 
 # Review Implementation Plan
 
 Primary lens: `Review`.
 
+Invoked by: orchestrate-work-plan, user directly. Delegates to: none.
+
 ## Goal
 
-Find plan defects before implementation starts. Prefer concrete blockers over broad advice.
+Catch bad implementation plans before code is written.
 
 ## Workflow
 
-1. Read the plan and only the routed docs or code needed to judge it.
-2. Check scope boundaries, acceptance, dependencies, task size, and validation.
-3. Check whether the plan names enough files/areas and repo patterns to be executable.
-4. Flag missing product, architecture, data, UX, or validation decisions that could change implementation.
-5. Do not redesign the feature unless the current plan is unsafe or unworkable.
+1. Read the implementation plan.
+2. Read the source issue/backlog/tracker item when available.
+3. Load only needed standards docs for affected areas.
+4. Return findings only; do not edit.
+
+## Checklist
+
+- Scope stays inside the selected work item.
+- Tasks are concrete, ordered, dependency-aware, and small enough to validate.
+- Risk tier or review gate is named when the repo defines one.
+- Architecture, data, UX, auth, and external-system choices are explicit when relevant.
+- Tests and validation match the repo strategy.
+- No unresolved product, UX, data, architecture, or validation ambiguity remains.
 
 ## Output
 
-Findings first:
-
-- `[Blocking|Non-blocking] <finding>`
+- `[Blocking|Non-blocking] file:line - finding`
 - `Why it matters: <short impact>`
 - `Suggested fix: <short action>`
+- `Verdict: Pass|Fail`
 
-End with `Verdict: Pass` or `Verdict: Fail`.
+`Fail` means at least one blocking finding remains.
 """,
         ".agents/skills/review-implementation-plan/agents/openai.yaml": """interface:
   display_name: "Review Implementation Plan"
@@ -641,14 +676,14 @@ End with `Verdict: Pass` or `Verdict: Fail`.
 """,
         ".agents/skills/resolve-bug/SKILL.md": """---
 name: resolve-bug
-description: Investigate, fix, and validate a reported bug, regression, or concrete runtime incident. Use when the user reports broken behavior or asks Codex to reproduce and fix a defect.
+description: Investigate, fix, and validate a reported bug, regression, or concrete runtime incident. Use when the user reports broken behavior, asks Codex to reproduce and fix a defect, or an orchestrated workflow needs a focused bug-resolution pass.
 ---
 
 # Resolve Bug
 
 Primary lens: `Implementation`.
 
-Delegates to: `plan-implementation-work` for sensitive changes, `review-changed-code` for risky fixes, and validation skills approved for this repo.
+Invoked by: orchestrate-work-plan, user directly. Delegates to: plan-implementation-work for sensitive changes, approved validation/docs skills, and review-changed-code.
 
 ## Goal
 
@@ -658,9 +693,11 @@ Turn a reported symptom into a minimal, validated fix with regression coverage w
 
 1. Clarify only blocking ambiguity.
    - Observed symptom, expected behavior, reproduction path, environment, affected workflow.
+   - If the report is broad, narrow to the smallest failing behavior before editing.
 2. Reproduce or prove the failure.
    - Prefer the fastest reliable reproduction: focused test, command, log, local flow, API call, or browser check.
-   - If reproduction is impossible, state the strongest evidence and uncertainty.
+   - Record what failed and how it was observed.
+   - If reproduction is impossible, identify the strongest evidence and state the uncertainty before fixing.
 3. Isolate the cause.
    - Inspect the smallest relevant code path and nearby patterns.
 4. Plan only when scope or risk demands it.
@@ -669,9 +706,13 @@ Turn a reported symptom into a minimal, validated fix with regression coverage w
    - Re-run the failing reproduction first.
    - Add or update regression coverage at the right layer when useful.
    - Use approved UI/API/CLI/deployed validation skills when the surface changed.
-7. Report root cause, changed files, validation, and residual risk.
+7. Run `review-changed-code` when the fix is non-trivial, risky, or workflow-owned.
+8. Report root cause, changed files, validation, and residual risk.
 
-Do not turn a bug pass into unrelated cleanup.
+## Do Not
+
+- Do not turn a bug pass into unrelated cleanup.
+- Do not use this for broad code review, CI debugging, or unresolved PR review comments until they are converted into a concrete symptom.
 """,
         ".agents/skills/resolve-bug/agents/openai.yaml": """interface:
   display_name: "Resolve Bug"
@@ -682,51 +723,96 @@ Do not turn a bug pass into unrelated cleanup.
     "orchestration-skill": {
         ".agents/skills/orchestrate-work-plan/SKILL.md": """---
 name: orchestrate-work-plan
-description: Orchestrate a PRD, backlog, feature plan, story breakdown, or multi-task implementation document as a resumable delivery workflow. Use when Codex should take approved work through planning, implementation, validation, review, and handoff.
+description: Low-context queue runner for an approved backlog, implementation plan, workflow file, tracker item, or multi-task work source. Use when Codex should turn accepted work into one item at a time, create minimal handoff packets, delegate execution, reconcile durable state, and continue safely.
 ---
 
 # Orchestrate Work Plan
 
-Primary lens: `Implementation`; switch to `Product/PRD` or `Review` for matching gates.
+Primary lens: `Implementation`; switch to `Review` only for gates.
 
-Delegates to: `plan-implementation-work`, `review-implementation-plan`, `implement-planned-work`, and `review-changed-code`.
+Invoked by: user directly. Delegates to: plan-implementation-work, review-implementation-plan, implement-planned-work.
 
 ## Goal
 
-Turn a source document or approved work item into a durable, resumable implementation workflow.
+Run the queue. Keep context small.
 
-Move one implementation slice at a time:
+Own:
 
-`source -> task queue -> implementation plan -> implementation -> validation -> review -> handoff`
+- source resolution
+- queue/workflow state
+- one-item selection
+- implementation-plan gate
+- compact worker handoff
+- result reconciliation
+- backlog/workflow/tracker status
+
+Do not own:
+
+- implementation internals
+- changed-code review checklist
+- browser/API/CLI validation procedure
+- docs-update procedure
+
+## Source Modes
+
+- Implementation plan: execute directly.
+- Workflow state: resume queue before selecting new work.
+- Backlog or tracker item: select one ready item.
+- Chat or issue: plan first unless already executable.
+
+Default granularity: one ready item or smaller concrete task.
 
 ## Preconditions
 
 1. Check `git status --short --branch`.
-2. Require a clean worktree unless the user explicitly wants to include existing changes.
-3. Follow repo branch, commit, tracker, and PR rules from `docs/development/`.
+2. Require a clean worktree unless the active workflow owns the current diff or the user opted in.
+3. Report unpushed baseline commits when remote-safe workflow is implied.
 
-## Workflow
+## Queue State
 
-1. Resolve the source.
-   - PRD, backlog, plan file, tracker item, issue, PR comment, or chat.
-   - Stop on missing access or ambiguous source.
-2. Normalize work into independent task packets.
-   - Preserve existing IDs.
-   - Split until each packet can be implemented, validated, reviewed, and handed off independently.
-   - Mark tasks blocked when requirements are missing.
-3. Create or update workflow state when file-based tracking is approved.
-4. For each ready task:
-   - Write or confirm a focused implementation plan.
-   - Run `review-implementation-plan` when scope, architecture, UX, data, or validation risk warrants it.
-   - Execute through `implement-planned-work`.
-   - Inspect the diff yourself.
-   - Run validation and `review-changed-code`.
-   - Update workflow/tracker state with files, validation, review, blockers, and residual risk.
-5. Stop when all tasks are done, skipped, or blocked on a real decision.
+Workflow file stays concise:
 
-## Workflow File Shape
+- source path
+- branch/worktree
+- status
+- queue table
+- current task
+- short log
+- evidence/result artifact links
 
-Use this compact form when file-based workflow state is approved:
+Detailed validation, screenshots, review output, docs audit, and residual risk go under `artifacts/<item-id>/`, not in the workflow body.
+
+## Planning Gate
+
+For a selected item:
+
+1. Use an existing current implementation plan when present and still accurate.
+2. Otherwise invoke `plan-implementation-work` with item ID, acceptance, likely affected areas, and expected validation.
+3. Run `review-implementation-plan` when the repo workflow or risk requires it.
+4. Write the approved plan under the repo's approved plan location when file-based plans are used.
+5. Mark the item `planned`.
+
+Raise only blocking ambiguity to the real user. Continue around blocked items when independent ready work remains.
+
+## Execute One Item
+
+1. Mark workflow/tracker/backlog item `in_progress`.
+2. Write a minimal handoff packet:
+   - item ID and goal
+   - source and plan paths
+   - scope in/out
+   - acceptance
+   - expected validation
+   - result artifact path
+3. Delegate to `implement-planned-work`.
+4. Inspect returned result artifact, `git status`, and `git diff --stat`.
+5. Reconcile backlog/workflow/tracker state.
+6. Commit only when commit ownership was explicitly assigned.
+7. Return control with paths, status, validation, review decisions, blockers, and residual risk.
+
+The queue is not complete until every item is `done` or explicitly `skipped`.
+
+## Compact Workflow Shape
 
 ```md
 # Workflow: <title>
@@ -755,7 +841,26 @@ None
 - <date>: Created workflow from <source>.
 ```
 
-## Completion
+## Stop Conditions
+
+Stop after updating durable state when:
+
+- worktree has overlapping unexpected changes
+- all remaining items need user decisions
+- validation fails after focused repair
+- scope must expand beyond the item packet
+- commit cannot be created cleanly
+- queue state and git history disagree
+
+## Resume
+
+1. Read the workflow file first.
+2. Check git status and recent commits.
+3. Reconcile queue, source items, result artifacts, and git history.
+4. Finish, block, or restore any `in_progress` task based on actual diff.
+5. Continue with the next unblocked item.
+
+## Completion Report
 
 Report workflow/tracker path, completed IDs, validation, review result, blocked/skipped work, residual risk, and commit/PR status only if performed.
 """,
@@ -774,6 +879,8 @@ description: Audit repository standards and guidance docs for missing, stale, du
 # Audit Standards Docs
 
 Primary lens: `Review`.
+
+Invoked by: user directly, update-documentation, implement-planned-work. Delegates to: none.
 
 ## Goal
 
@@ -799,6 +906,11 @@ Audit the repository's guidance as a documentation system, not isolated files. B
 - supporting file paths
 - issue type: missing doc, wrong placement, stale content, duplication, over-context, or verbosity
 - conclusion: fix now, defer, or no change needed
+
+## Do Not
+
+- Do not read draft or historical docs unless the task asks for them.
+- Do not call guidance stale without checking repo evidence.
 """,
         ".agents/skills/audit-standards-docs/agents/openai.yaml": """interface:
   display_name: "Audit Standards Docs"
@@ -813,6 +925,8 @@ description: Audit this repository for missing repo-local Codex skills. Use to d
 # Audit Skill Opportunities
 
 Primary lens: `Review`.
+
+Invoked by: user directly, bootstrap-repo-standards. Delegates to: none.
 
 ## Goal
 
@@ -848,6 +962,11 @@ A candidate must be:
 - file evidence
 - decision: `create skill`, `docs are enough`, `existing skill covers it`, or `defer`
 - conclusion: `create now`, `defer`, or `no change needed`
+
+## Do Not
+
+- Do not create skills during this audit unless the user explicitly changes the task to creation.
+- Do not recommend broad "do everything in this repo" skills.
 """,
         ".agents/skills/audit-skill-opportunities/agents/openai.yaml": """interface:
   display_name: "Audit Skill Opportunities"
@@ -862,6 +981,8 @@ description: Update or propose updates to repo docs and agent routes when code, 
 # Update Documentation
 
 Primary lens: `Implementation`.
+
+Invoked by: implement-planned-work, resolve-bug, user directly. Delegates to: audit-standards-docs when a broader docs review is needed.
 
 ## Goal
 
@@ -889,6 +1010,11 @@ Keep human docs and agent routes current without duplicating guidance or turning
 - route/index updates
 - docs intentionally unchanged
 - unresolved docs decisions or follow-ups
+
+## Do Not
+
+- Do not rewrite broad docs when a route or paragraph update is enough.
+- Do not put agent-only behavior in human-facing docs.
 """,
         ".agents/skills/update-documentation/agents/openai.yaml": """interface:
   display_name: "Update Documentation"
@@ -905,6 +1031,8 @@ description: Validate UI changes in the local app with the approved browser work
 # Validate UI In Browser
 
 Primary lens: `UX`.
+
+Invoked by: implement-planned-work, resolve-bug, user directly. Delegates to: none.
 
 Load the browser-control skill first when available.
 
@@ -937,6 +1065,11 @@ Load the browser-control skill first when available.
 - console/UI issues
 - cleanup result
 - blockers
+
+## Do Not
+
+- Do not use this skill when the repo has no confirmed UI surface.
+- Do not mark browser validation complete when required evidence is missing.
 """,
         ".agents/skills/validate-ui-in-browser/agents/openai.yaml": """interface:
   display_name: "Validate UI In Browser"
@@ -947,13 +1080,38 @@ Load the browser-control skill first when available.
 }
 
 
-def selected_templates(sets: list[str]) -> dict[str, str]:
+def matches_only(relative_path: str, patterns: list[str]) -> bool:
+    if not patterns:
+        return True
+    normalized = relative_path.replace("\\", "/")
+    parts = set(normalized.split("/"))
+    for pattern in patterns:
+        wanted = pattern.replace("\\", "/")
+        if normalized == wanted or fnmatch(normalized, wanted):
+            return True
+        if "/" not in wanted and "*" not in wanted and wanted in parts:
+            return True
+    return False
+
+
+def selected_templates(sets: list[str], only_patterns: list[str] | None = None) -> dict[str, str]:
     files: dict[str, str] = {}
     for set_name in sets:
         if set_name not in TEMPLATES:
             allowed = ", ".join(sorted(TEMPLATES))
             raise SystemExit(f"Unknown set '{set_name}'. Allowed: {allowed}")
         files.update(TEMPLATES[set_name])
+    patterns = only_patterns or []
+    if patterns:
+        files = {
+            relative_path: content
+            for relative_path, content in files.items()
+            if matches_only(relative_path, patterns)
+        }
+        if not files:
+            raise SystemExit(
+                "No template files matched --only. Use --list to inspect available paths."
+            )
     return files
 
 
@@ -978,6 +1136,13 @@ def main() -> int:
         dest="sets",
         default=[],
         help=f"Template set to scaffold. Repeatable. Allowed: {', '.join(sorted(TEMPLATES))}.",
+    )
+    parser.add_argument(
+        "--only",
+        action="append",
+        default=[],
+        metavar="PATH_OR_GLOB",
+        help="Limit selected sets to matching relative paths, globs, or single path parts. Repeatable.",
     )
     parser.add_argument("--list", action="store_true", help="List template sets and files.")
     parser.add_argument(
@@ -1006,7 +1171,7 @@ def main() -> int:
         raise SystemExit(f"Choose at least one explicit --set. Allowed: {allowed}")
 
     sets = args.sets
-    templates = selected_templates(sets)
+    templates = selected_templates(sets, args.only)
 
     created: list[str] = []
     skipped: list[str] = []
@@ -1026,6 +1191,8 @@ def main() -> int:
 
     print(f"mode: {args.mode}")
     print(f"sets: {', '.join(sets)}")
+    if args.only:
+        print(f"only: {', '.join(args.only)}")
     print("created:")
     for path in created:
         print(f"- {path}")

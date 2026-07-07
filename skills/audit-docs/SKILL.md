@@ -5,6 +5,8 @@ description: Lightweight documentation audit workflow for checking repo docs, in
 
 # Audit Docs
 
+Primary lens: `Review`.
+
 ## Goal
 
 Review docs as a navigable system. Find drift, duplication, missing routes, and unclear maintenance rules. Prefer focused fixes over new documentation layers.
@@ -40,7 +42,7 @@ Review docs as a navigable system. Find drift, duplication, missing routes, and 
    - At minimum, run `git status --short` and `rg --files`.
    - For changed links or routes, verify referenced files exist.
 
-## Findings Format
+## Output
 
 Order findings by impact:
 
@@ -51,3 +53,8 @@ Order findings by impact:
 - overlarge or misplaced agent-only guidance
 
 If no meaningful issue exists, say `no change needed` and do not invent cosmetic findings.
+
+## Do Not
+
+- Do not create broad docs, roadmaps, or repo-local skills without explicit approval.
+- Do not call a doc stale without checking repo evidence.

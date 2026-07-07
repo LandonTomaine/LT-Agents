@@ -5,6 +5,8 @@ description: Lightweight end-to-end coding workflow for taking a user request th
 
 # Ship Change
 
+Primary lens: `Implementation`.
+
 ## Goal
 
 Move a repo request from intent to delivered local changes with minimal ceremony, while keeping approval boundaries clear before commit and push.
@@ -51,7 +53,7 @@ Move a repo request from intent to delivered local changes with minimal ceremony
 - If publishing requires auth, remote creation, or a new branch, explain the target before acting.
 - If the push fails, stop and report the exact blocker; do not try destructive fixes.
 
-## Handoff Format
+## Output
 
 Keep the final answer short:
 
@@ -59,3 +61,8 @@ Keep the final answer short:
 - validation run
 - commit SHA and push target, if shipped
 - anything not done or still needing approval
+
+## Do Not
+
+- Do not re-plan broad scope after implementation has started unless the request proves unsafe or ambiguous.
+- Do not commit or push from vague approval.
