@@ -2,25 +2,29 @@
 
 This directory contains self-contained Codex skill packages.
 
-## Bootstrapper Quickstart
+## Plugin Quickstart
 
-Install:
+Install the repository root as a Codex plugin. The root manifest `.codex-plugin/plugin.json` points to `./skills/`, so the plugin includes every direct child skill package and its nested `references/`, `scripts/`, and `agents/` files.
 
-```text
-$skill-installer install https://github.com/LandonTomaine/LT-Agents/tree/main/skills/bootstrap-repo-standards
-```
-
-Restart Codex.
-
-Run from the target repo:
+Restart Codex, then run from the target repo:
 
 ```text
 Use $bootstrap-repo-standards to bootstrap this repo.
 ```
 
-## Plugin Packaging
+## Raw Skill Quickstart
 
-The repository root contains `.codex-plugin/plugin.json` with `"skills": "./skills/"`. Plugin installs include each direct child skill package plus its nested `references/`, `scripts/`, and `agents/` files.
+Raw install remains useful for local testing or installing one skill:
+
+```text
+$skill-installer install https://github.com/LandonTomaine/LT-Agents/tree/main/skills/bootstrap-repo-standards
+```
+
+Restart Codex, then run from the target repo:
+
+```text
+Use $bootstrap-repo-standards to bootstrap this repo.
+```
 
 ## Public Skill Packages
 

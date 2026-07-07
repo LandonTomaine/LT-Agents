@@ -6,7 +6,7 @@ from __future__ import annotations
 import json
 import re
 import sys
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any
 from urllib.parse import urlparse
 
@@ -134,6 +134,72 @@ def validate_relative_path(
         errors.append(f"{field}: path must be a file: {value}")
 
 
+def normalize_contract_path(raw_path: str) -> str | None:
+    path = Path(raw_path)
+    if path.is_absolute():
+        return None
+    normalized = path.as_posix().rstrip("/")
+    return normalized or None
+
+
+def validate_contract_path(
+    data: dict[str, Any],
+    field: str,
+    expected: str,
+    errors: list[str],
+) -> None:
+    value = data.get(field)
+    if value is None:
+        return
+    normalized = normalize_contract_path(value) if isinstance(value, str) else None
+    if normalized != expected:
+        errors.append(f"{field}: must resolve to {expected}")
+
+
+def validate_mcp_server_entries(
+    servers: Any,
+    source_label: str,
+    field_label: str,
+    errors: list[str],
+) -> None:
+    if not isinstance(servers, dict):
+        errors.append(f"{field_label}: must be an object")
+        return
+    for key, value in servers.items():
+        if not isinstance(key, str) or not key.strip():
+            errors.append(f"{source_label}: server names must be non-empty strings")
+        if not isinstance(value, dict):
+            errors.append(f"{source_label}.{key}: server must be an object")
+
+
+def validate_asset_path(
+    base_dir: Path,
+    allowed_root: Path,
+    raw_path: Any,
+    field: str,
+    errors: list[str],
+    *,
+    require_png: bool = False,
+) -> None:
+    if not isinstance(raw_path, str) or not raw_path.strip():
+        errors.append(f"{field}: must be a non-empty relative path")
+        return
+    candidate = PurePosixPath(raw_path.replace("\\", "/"))
+    if candidate.is_absolute() or any(part in {"", ".", ".."} for part in candidate.parts):
+        errors.append(f"{field}: must stay inside the plugin archive")
+        return
+    if require_png and candidate.suffix.lower() != ".png":
+        errors.append(f"{field}: screenshots must be PNG files")
+    resolved_path = (base_dir / candidate.as_posix()).resolve()
+    try:
+        resolved_path.relative_to(allowed_root.resolve())
+    except ValueError:
+        errors.append(f"{field}: must stay inside the plugin archive")
+        return
+    if not resolved_path.is_file():
+        errors.append(f"{field}: points to a missing file")
+
+
 def main() -> int:
     if not PLUGIN_JSON.is_file():
         print(f"Missing plugin manifest: {PLUGIN_JSON}", file=sys.stderr)
@@ -185,6 +251,20 @@ def main() -> int:
     if skills_path:
         validate_relative_path(skills_path, "skills", errors, expect_dir=True)
 
+    validate_contract_path(data, "apps", ".app.json", errors)
+
+    mcp_servers = data.get("mcpServers")
+    if isinstance(mcp_servers, str):
+        validate_contract_path(data, "mcpServers", ".mcp.json", errors)
+        validate_relative_path(mcp_servers, "mcpServers", errors, expect_file=True)
+    elif mcp_servers is not None:
+        validate_mcp_server_entries(
+            mcp_servers,
+            "mcpServers",
+            "mcpServers",
+            errors,
+        )
+
     capabilities = interface.get("capabilities")
     if not isinstance(capabilities, list) or not all(
         isinstance(value, str) and value.strip() for value in capabilities
@@ -200,6 +280,25 @@ def main() -> int:
     ):
         errors.append("interface.brandColor: must use #RRGGBB")
 
+    for field in ("composerIcon", "logo", "logoDark"):
+        raw_path = interface.get(field)
+        if raw_path is not None:
+            validate_asset_path(ROOT, ROOT, raw_path, f"interface.{field}", errors)
+
+    screenshots = interface.get("screenshots", [])
+    if not isinstance(screenshots, list):
+        errors.append("interface.screenshots: must be a list")
+    else:
+        for index, raw_path in enumerate(screenshots):
+            validate_asset_path(
+                ROOT,
+                ROOT,
+                raw_path,
+                f"interface.screenshots[{index}]",
+                errors,
+                require_png=True,
+            )
+
     default_prompt = interface.get("defaultPrompt", interface.get("default_prompt"))
     if default_prompt is not None:
         if not isinstance(default_prompt, list):
@@ -214,10 +313,6 @@ def main() -> int:
                     errors.append(f"interface.defaultPrompt[{index}]: exceeds 128 characters")
     else:
         errors.append("interface.defaultPrompt: missing list")
-
-    for field in ("apps", "mcpServers"):
-        if field in data and isinstance(data[field], str):
-            validate_relative_path(data[field], field, errors, expect_file=True)
 
     if "hooks" in data:
         errors.append("hooks: unsupported in plugin.json")
