@@ -18,6 +18,10 @@ Run from the target repo:
 Use $bootstrap-repo-standards to bootstrap this repo.
 ```
 
+## Plugin Packaging
+
+The repository root contains `.codex-plugin/plugin.json` with `"skills": "./skills/"`. Plugin installs include each direct child skill package plus its nested `references/`, `scripts/`, and `agents/` files.
+
 ## Public Skill Packages
 
 Each direct child directory is a raw installable skill package for local use with `$skill-installer`. Nested `references/`, `scripts/`, and `agents/` folders are package internals.
@@ -41,7 +45,7 @@ Then invoke with `$<skill-name>`, for example:
 Use $bootstrap-repo-standards to bootstrap this repo.
 ```
 
-For broad public distribution, prefer packaging these skills as Codex plugins. Raw skill folders are still useful for local installation, testing, and private sharing.
+For broad public distribution, use the root Codex plugin manifest. Raw skill folders are still useful for local installation, testing, and private sharing.
 
 ## Adding Skills
 

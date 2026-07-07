@@ -8,16 +8,11 @@ This repository is organized as a durable home for reusable agent knowledge. Eac
 
 Prerequisites:
 
-- Codex with skill support
+- Codex with plugin and skill support
 - GitHub access to this repo
-- Network access for `$skill-installer`
 - Python 3 available to Codex for `bootstrap-repo-standards`
 
-Install:
-
-```text
-$skill-installer install https://github.com/LandonTomaine/LT-Agents/tree/main/skills/bootstrap-repo-standards
-```
+Install this repository as a Codex plugin from its GitHub source. The plugin manifest is `.codex-plugin/plugin.json` and includes all skill packages under `./skills/`, including nested `references/`, `scripts/`, and `agents/` files.
 
 Restart Codex.
 
@@ -35,7 +30,13 @@ What happens:
 4. Proposes an exact file/action manifest.
 5. Writes only approved files.
 
-Manual install after cloning:
+Raw single-skill install remains available for local testing:
+
+```text
+$skill-installer install https://github.com/LandonTomaine/LT-Agents/tree/main/skills/bootstrap-repo-standards
+```
+
+Manual raw install after cloning:
 
 ```powershell
 git clone https://github.com/LandonTomaine/LT-Agents.git
@@ -62,9 +63,19 @@ Use $bootstrap-repo-standards to bootstrap this repo.
 | `scripts/` | Catalog maintenance and validation helpers. |
 | `AGENTS.md` | Instructions for Codex agents working in this repository. |
 
+## Plugin Install
+
+This repository is packaged as a Codex plugin. The plugin manifest lives at `.codex-plugin/plugin.json` and points to `./skills/`, so each skill package includes its nested `references/`, `scripts/`, and `agents/` files when installed as a plugin.
+
+Install the plugin from this repository using Codex's standard plugin install flow for a GitHub plugin source. After install, restart Codex if needed and invoke the included skills by name, for example:
+
+```text
+Use $bootstrap-repo-standards to bootstrap this repo.
+```
+
 ## Public Skill Packages
 
-This repo currently publishes raw Codex skill folders for local install with `$skill-installer`. Codex's preferred distribution unit for reusable public packages is a plugin; these folders are local-install packages until this repo adds plugin manifests.
+The plugin publishes these skills from `skills/<skill-name>/`. Raw skill-folder install with `$skill-installer` is still useful for local testing or installing a single skill.
 
 Installable raw skills live only at `skills/<skill-name>/`. Files under a skill's `references/`, `scripts/`, or `agents/` folders are package internals, not separate public skills.
 
@@ -125,7 +136,7 @@ Restart Codex after installing or updating skills. `$skill-installer` installs i
 
 ## Plugin Distribution
 
-For broad public distribution, package one or more skills as a Codex plugin with `.codex-plugin/plugin.json` and a plugin-root `skills/` directory. Use raw skill-folder install for local setup, testing, and private sharing; use plugins when the package should be discoverable, versioned, and installable as a reusable product.
+For broad public distribution, use the root Codex plugin manifest. Keep raw skill-folder install docs for local setup, testing, and private sharing.
 
 ## Maintaining This Repo
 
@@ -167,7 +178,13 @@ Run the catalog validator:
 python scripts\validate_skills.py
 ```
 
-GitHub Actions runs the same validation on pushes and pull requests.
+Run plugin validation when plugin metadata or packaged skills change:
+
+```powershell
+python scripts\validate_plugin.py
+```
+
+GitHub Actions runs the same skill and plugin validation on pushes and pull requests.
 
 ## Git Workflow
 

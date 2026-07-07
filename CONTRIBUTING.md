@@ -2,6 +2,8 @@
 
 This repository is a curated catalog of reusable Codex skills. Keep changes focused, portable, and easy to install.
 
+The repository root is also a Codex plugin package. Keep `.codex-plugin/plugin.json` aligned with the public skills under `skills/`.
+
 ## Skill Requirements
 
 Each skill lives under `skills/<skill-name>/` and must include:
@@ -24,13 +26,19 @@ Do not add extra README, install, changelog, or guide files inside a skill packa
 1. Add or edit the skill under `skills/`.
 2. Update `README.md` and `skills/README.md`.
 3. Keep package boundaries intact; do not depend on repo-level docs from inside a skill.
-4. Run validation:
+4. Run skill validation:
 
 ```powershell
 python scripts\validate_skills.py
 ```
 
-5. Review the diff before committing:
+5. When plugin metadata, package layout, or included skills change, run plugin validation:
+
+```powershell
+python scripts\validate_plugin.py
+```
+
+6. Review the diff before committing:
 
 ```powershell
 git status --short
