@@ -7,12 +7,80 @@ import json
 import re
 import sys
 from pathlib import Path
+from typing import Any
+from urllib.parse import urlparse
 
 
 ROOT = Path(__file__).resolve().parents[1]
 PLUGIN_JSON = ROOT / ".codex-plugin" / "plugin.json"
 NAME_RE = re.compile(r"^[a-z0-9][a-z0-9-]{0,62}[a-z0-9]$")
-SEMVER_RE = re.compile(r"^\d+\.\d+\.\d+$")
+SEMVER_RE = re.compile(
+    r"^(0|[1-9]\d*)\."
+    r"(0|[1-9]\d*)\."
+    r"(0|[1-9]\d*)"
+    r"(?:-(?:0|[1-9]\d*|\d*[A-Za-z-][0-9A-Za-z-]*)(?:\."
+    r"(?:0|[1-9]\d*|\d*[A-Za-z-][0-9A-Za-z-]*))*)?"
+    r"(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$"
+)
+HEX_COLOR_RE = re.compile(r"^#[0-9A-F]{6}$", re.IGNORECASE)
+ALLOWED_TOP_LEVEL = {
+    "id",
+    "name",
+    "version",
+    "description",
+    "skills",
+    "apps",
+    "mcpServers",
+    "interface",
+    "author",
+    "homepage",
+    "repository",
+    "license",
+    "keywords",
+}
+ALLOWED_AUTHOR_FIELDS = {"name", "email", "url"}
+ALLOWED_INTERFACE_FIELDS = {
+    "displayName",
+    "shortDescription",
+    "longDescription",
+    "developerName",
+    "category",
+    "capabilities",
+    "websiteURL",
+    "privacyPolicyURL",
+    "termsOfServiceURL",
+    "brandColor",
+    "composerIcon",
+    "logo",
+    "logoDark",
+    "screenshots",
+    "defaultPrompt",
+    "default_prompt",
+}
+
+
+def reject_todo_markers(value: Any, path: str, errors: list[str]) -> None:
+    if isinstance(value, str):
+        if "[TODO:" in value:
+            errors.append(f"{path}: contains TODO placeholder")
+        return
+    if isinstance(value, list):
+        for index, item in enumerate(value):
+            reject_todo_markers(item, f"{path}[{index}]", errors)
+        return
+    if isinstance(value, dict):
+        for key, item in value.items():
+            reject_todo_markers(item, f"{path}.{key}", errors)
+
+
+def reject_unknown_fields(
+    data: dict[str, Any],
+    allowed: set[str],
+    label: str,
+    errors: list[str],
+) -> None:
+    for key in sorted(set(data) - allowed):
+        errors.append(f"{label}.{key}: unsupported field")
 
 
 def require_string(data: dict, path: str, errors: list[str]) -> str:
@@ -28,12 +96,26 @@ def require_string(data: dict, path: str, errors: list[str]) -> str:
     if not isinstance(value, str) or not value.strip():
         errors.append(f"{path}: missing string")
         return ""
-    if "[TODO:" in value:
-        errors.append(f"{path}: contains TODO placeholder")
     return value
 
 
-def validate_relative_path(value: str, field: str, errors: list[str]) -> None:
+def validate_https_url(data: dict[str, Any], field: str, errors: list[str]) -> None:
+    value = data.get(field)
+    if value is None:
+        return
+    parsed = urlparse(value) if isinstance(value, str) else None
+    if parsed is None or parsed.scheme != "https" or not parsed.netloc:
+        errors.append(f"{field}: must be an absolute https:// URL")
+
+
+def validate_relative_path(
+    value: str,
+    field: str,
+    errors: list[str],
+    *,
+    expect_dir: bool = False,
+    expect_file: bool = False,
+) -> None:
     if not value.startswith("./"):
         errors.append(f"{field}: path must start with ./")
         return
@@ -45,6 +127,11 @@ def validate_relative_path(value: str, field: str, errors: list[str]) -> None:
         return
     if not target.exists():
         errors.append(f"{field}: path does not exist: {value}")
+        return
+    if expect_dir and not target.is_dir():
+        errors.append(f"{field}: path must be a directory: {value}")
+    if expect_file and not target.is_file():
+        errors.append(f"{field}: path must be a file: {value}")
 
 
 def main() -> int:
@@ -59,6 +146,9 @@ def main() -> int:
         return 1
 
     errors: list[str] = []
+    reject_todo_markers(data, "$", errors)
+    reject_unknown_fields(data, ALLOWED_TOP_LEVEL, "plugin", errors)
+
     name = require_string(data, "name", errors)
     if name and not NAME_RE.match(name):
         errors.append(f"name: invalid plugin name: {name}")
@@ -68,7 +158,23 @@ def main() -> int:
         errors.append(f"version: must be strict semver: {version}")
 
     require_string(data, "description", errors)
-    require_string(data, "author.name", errors)
+    validate_https_url(data, "homepage", errors)
+    validate_https_url(data, "repository", errors)
+
+    author = data.get("author")
+    if not isinstance(author, dict):
+        errors.append("author: missing object")
+    else:
+        reject_unknown_fields(author, ALLOWED_AUTHOR_FIELDS, "author", errors)
+        require_string(data, "author.name", errors)
+        validate_https_url(author, "url", errors)
+
+    interface = data.get("interface")
+    if not isinstance(interface, dict):
+        errors.append("interface: missing object")
+        interface = {}
+    else:
+        reject_unknown_fields(interface, ALLOWED_INTERFACE_FIELDS, "interface", errors)
     require_string(data, "interface.displayName", errors)
     require_string(data, "interface.shortDescription", errors)
     require_string(data, "interface.longDescription", errors)
@@ -77,9 +183,24 @@ def main() -> int:
 
     skills_path = require_string(data, "skills", errors)
     if skills_path:
-        validate_relative_path(skills_path, "skills", errors)
+        validate_relative_path(skills_path, "skills", errors, expect_dir=True)
 
-    default_prompt = data.get("interface", {}).get("defaultPrompt")
+    capabilities = interface.get("capabilities")
+    if not isinstance(capabilities, list) or not all(
+        isinstance(value, str) and value.strip() for value in capabilities
+    ):
+        errors.append("interface.capabilities: must be a list of strings")
+
+    for field in ("websiteURL", "privacyPolicyURL", "termsOfServiceURL"):
+        validate_https_url(interface, field, errors)
+
+    brand_color = interface.get("brandColor")
+    if brand_color is not None and (
+        not isinstance(brand_color, str) or HEX_COLOR_RE.fullmatch(brand_color) is None
+    ):
+        errors.append("interface.brandColor: must use #RRGGBB")
+
+    default_prompt = interface.get("defaultPrompt", interface.get("default_prompt"))
     if default_prompt is not None:
         if not isinstance(default_prompt, list):
             errors.append("interface.defaultPrompt: must be a list")
@@ -91,10 +212,12 @@ def main() -> int:
                     errors.append(f"interface.defaultPrompt[{index}]: missing string")
                 elif len(prompt) > 128:
                     errors.append(f"interface.defaultPrompt[{index}]: exceeds 128 characters")
+    else:
+        errors.append("interface.defaultPrompt: missing list")
 
-    for field in ("apps", "mcpServers", "hooks"):
+    for field in ("apps", "mcpServers"):
         if field in data and isinstance(data[field], str):
-            validate_relative_path(data[field], field, errors)
+            validate_relative_path(data[field], field, errors, expect_file=True)
 
     if "hooks" in data:
         errors.append("hooks: unsupported in plugin.json")
