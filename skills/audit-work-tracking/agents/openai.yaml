@@ -1,0 +1,4 @@
+interface:
+  display_name: "Audit Work Tracking"
+  short_description: "Audit backlog and tracker workflows"
+  default_prompt: "Use $audit-work-tracking to review this repo's backlog or tracker workflow."

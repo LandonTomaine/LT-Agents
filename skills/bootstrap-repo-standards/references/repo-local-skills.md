@@ -85,6 +85,7 @@ Ask whether these capabilities should be repo-local, user/global, ignored, or de
 
 - `triage-work-intake`: capture and route incoming work without planning or implementing it.
 - `pick-next-work-item`: choose one next work target from an approved tracker or backlog.
+- `audit-work-tracking`: review backlog, tracker, status vocabulary, routing, artifact, and closeout systems.
 - `audit-skills`: review skills for trigger quality, brevity, DRYness, and resource placement.
 - `improve-ai-self`: turn repeated agent failures or bad assumptions into updated guidance, skills, scripts, or docs.
 - `update-documentation`: update or propose updates to repo docs and agent routes when code, commands, product behavior, architecture, validation, deployment, or standards change.
@@ -100,6 +101,7 @@ When asking the user about any skill candidate, include the description, placeme
 Use this compact shape:
 
 - `audit-skills`: reviews skills for trigger quality, brevity, DRYness, and whether content belongs in `SKILL.md`, `references/`, or `scripts/`. Should this be repo-local, user/global, ignored, or deferred?
+- `audit-work-tracking`: reviews backlog, tracker, status vocabulary, routing, artifact, and closeout systems for drift or unnecessary token cost. Should this be repo-local, user/global, ignored, or deferred?
 - `improve-ai-self`: analyzes repeated agent failures or bad assumptions and turns them into updated guidance, skills, scripts, or docs. Should this be repo-local, user/global, ignored, or deferred?
 - `update-documentation`: updates or proposes updates to the repo's human docs and agent routes when code, commands, product behavior, architecture, validation, deployment, or standards change. Should this be repo-local, user/global, ignored, or deferred?
 

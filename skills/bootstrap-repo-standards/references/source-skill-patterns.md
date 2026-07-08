@@ -37,6 +37,7 @@ Usually reference or keep global:
 
 - `audit-docs`: docs routing, duplication, stale guidance, ownership, maintenance.
 - `audit-skills`: trigger quality, brevity, DRYness, `SKILL.md` vs `references/` vs `scripts/`.
+- `audit-work-tracking`: backlog, tracker, status vocabulary, routing, artifact, and closeout review.
 - `improve-ai-self`: repeated agent failure analysis and durable guidance/script fixes.
 - `brainstorm-app-idea`: early product discovery before repo standards or implementation planning.
 
@@ -73,6 +74,13 @@ Common downsizing moves:
 - keep orchestration optional unless the repo already works that way
 - keep implementation skills ignorant of queue/cursor state unless called by an orchestrator
 - keep orchestrators responsible for state reconciliation, not implementation internals
+
+Backlog-system moves:
+
+- separate active, done, deferred, bugs/incidents, enhancements, and tech-debt lanes only when file-based tracking is approved
+- keep backlog, workflow queue, bug/incident, and process-improvement status vocabularies distinct when they serve different decisions
+- put validation evidence, screenshots, review output, and residual risk in linked artifacts instead of queue bodies
+- keep indexes as maps, not hidden priority queues
 
 ## Workflow Mode Questions
 

@@ -25,6 +25,23 @@ Candidate files:
 
 Keep file-based examples generic. Do not imply all repos need PRDs, numbered capabilities, screenshots, or workflow-state files.
 
+Recommended separation:
+
+- Requirements describe product scope and acceptance; they do not own active execution state.
+- Backlog docs own delivery items and readiness.
+- Implementation plans own one approved execution approach.
+- Workflow files own resumable queue state.
+- Result artifacts own validation, screenshots, review output, blockers, and residual risk.
+- Indexes map active, done, and deferred work; they do not become hidden queues.
+
+Use distinct status vocabularies when the repo needs them:
+
+- Backlog or cursor items: `todo | planned | in_progress | review | done | blocked`.
+- Workflow queue rows: `pending | ready | in_progress | done | skipped | blocked`.
+- Bug or incident rows: `open | triaging | routed | in_progress | blocked | done`.
+
+Only create status vocabularies that the repo will actually use. Document who updates each state.
+
 Optional communication docs:
 
 - Create "what is next", release preview, roadmap, or stakeholder handoff docs only when communication planning is in scope.
@@ -35,7 +52,7 @@ Approved scaffold set:
 
 - `file-backlog`: backlog index, bugs/incidents table, follow-ups table, example capability backlog, plan template, workflow-state template, and artifact folders.
 
-Replace scaffold examples with repo-specific evidence before treating them as active work. Keep plan and workflow files short enough to reload cheaply.
+Replace scaffold examples with repo-specific evidence before treating them as active work. Keep plan and workflow files short enough to reload cheaply. Put large screenshots, logs, review transcripts, and validation details under the owning artifact path instead of the workflow body.
 
 ## External Tracker Mode
 
@@ -57,6 +74,8 @@ Propose a work-tracking skill only when the repo has a repeated tracker workflow
 
 Candidate examples:
 
+- triage incoming work into the right backlog, issue type, or deferred lane
+- select one next ready item from an approved tracker or backlog
 - plan a work item into an implementation plan
 - implement one approved work item
 - update tracker status and comments after validation

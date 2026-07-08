@@ -1,7 +1,7 @@
 {
   "name": "lt-agents",
   "version": "0.1.0",
-  "description": "Reusable Codex skills and bootstrap workflows for repository standards, docs, reviews, and change delivery.",
+  "description": "Reusable Codex skills and bootstrap workflows for repository standards, docs, work tracking, reviews, and change delivery.",
   "author": {
     "name": "Landon Tomaine",
     "url": "https://github.com/LandonTomaine"
@@ -20,7 +20,7 @@
   "interface": {
     "displayName": "LT Agents",
     "shortDescription": "Reusable Codex skills for repo standards and delivery.",
-    "longDescription": "LT Agents packages reusable Codex skills for auditing docs and skills, bootstrapping repository standards, and shipping scoped repo changes.",
+    "longDescription": "LT Agents packages reusable Codex skills for auditing docs, skills, and work tracking; bootstrapping repository standards; and shipping scoped repo changes.",
     "developerName": "Landon Tomaine",
     "category": "Productivity",
     "capabilities": [
@@ -29,7 +29,7 @@
     "websiteURL": "https://github.com/LandonTomaine/LT-Agents",
     "defaultPrompt": [
       "Use $bootstrap-repo-standards to bootstrap this repo.",
-      "Use $audit-skills to review this skill.",
+      "Use $audit-work-tracking to review this repo's backlog workflow.",
       "Use $ship-change to make this repo change."
     ],
     "brandColor": "#2563EB"

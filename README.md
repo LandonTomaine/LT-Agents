@@ -83,6 +83,7 @@ Installable raw skills live only at `skills/<skill-name>/`. Files under a skill'
 | --- | --- | --- |
 | [`audit-docs`](skills/audit-docs/SKILL.md) | Audits repo docs and indexes for stale content, duplication, missing routes, ownership gaps, and maintenance clarity. | `Use $audit-docs to review the docs.` |
 | [`audit-skills`](skills/audit-skills/SKILL.md) | Reviews Codex skills for trigger quality, brevity, DRYness, progressive disclosure, and resource placement. | `Use $audit-skills to review this skill.` |
+| [`audit-work-tracking`](skills/audit-work-tracking/SKILL.md) | Reviews backlog, tracker, status vocabulary, routing, artifact, and closeout systems for drift or unnecessary token cost. | `Use $audit-work-tracking to review this repo's backlog workflow.` |
 | [`bootstrap-repo-standards`](skills/bootstrap-repo-standards/SKILL.md) | Scans a target repo, interviews for product/architecture/tooling decisions, proposes docs, agent rules, validation, quality gates, and repo-local skills, then writes only approved files. | `Use $bootstrap-repo-standards to bootstrap this repo.` |
 | [`ship-change`](skills/ship-change/SKILL.md) | Takes a repo change from request through analysis, implementation, validation, handoff, and optional approved commit/push. | `Use $ship-change to make this repo change.` |
 
@@ -108,6 +109,7 @@ Current install URLs:
 ```text
 $skill-installer install https://github.com/LandonTomaine/LT-Agents/tree/main/skills/audit-docs
 $skill-installer install https://github.com/LandonTomaine/LT-Agents/tree/main/skills/audit-skills
+$skill-installer install https://github.com/LandonTomaine/LT-Agents/tree/main/skills/audit-work-tracking
 $skill-installer install https://github.com/LandonTomaine/LT-Agents/tree/main/skills/bootstrap-repo-standards
 $skill-installer install https://github.com/LandonTomaine/LT-Agents/tree/main/skills/ship-change
 ```

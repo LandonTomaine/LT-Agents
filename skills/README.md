@@ -34,6 +34,7 @@ Each direct child directory is a raw installable skill package for local use wit
 | --- | --- | --- |
 | [`audit-docs`](audit-docs/SKILL.md) | Review documentation systems for drift, duplication, missing routes, and unclear maintenance rules. | Git and `rg` recommended. |
 | [`audit-skills`](audit-skills/SKILL.md) | Review skills for trigger quality, brevity, DRYness, and resource placement. | Git and `rg` recommended. |
+| [`audit-work-tracking`](audit-work-tracking/SKILL.md) | Review backlog, tracker, status vocabulary, routing, artifact, and closeout systems. | Git and `rg` recommended. |
 | [`bootstrap-repo-standards`](bootstrap-repo-standards/SKILL.md) | Bootstrap or overhaul repo standards through scan, interview, checklist, manifest approval, docs, validation, quality gates, and repo-local skill decisions. | Python 3 required for bundled scripts; Git and `rg` recommended. |
 | [`ship-change`](ship-change/SKILL.md) | Implement a repo change end to end, validate it, and commit/push only after approval. | Git required for commit/push; repo validation commands as documented by the target repo. |
 
