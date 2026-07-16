@@ -1,0 +1,20 @@
+{
+  "name": "lt-agents",
+  "interface": {
+    "displayName": "LT Agents"
+  },
+  "plugins": [
+    {
+      "name": "lt-agents",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

@@ -4,7 +4,11 @@ This directory contains self-contained Codex skill packages.
 
 ## Plugin Quickstart
 
-Install the repository root as a Codex plugin. The root manifest `.codex-plugin/plugin.json` points to `./skills/`, so the plugin includes every direct child skill package and its nested `references/`, `scripts/`, and `agents/` files.
+Add the repository as a Codex plugin marketplace, then install **LT Agents** from it. The root manifest `.codex-plugin/plugin.json` points to `./skills/`, so the plugin includes every direct child skill package and its nested `references/`, `scripts/`, and `agents/` files.
+
+```powershell
+codex plugin marketplace add LandonTomaine/LT-Agents --ref main
+```
 
 Restart Codex, then run from the target repo:
 

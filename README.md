@@ -12,9 +12,13 @@ Prerequisites:
 - GitHub access to this repo
 - Python 3 available to Codex for `bootstrap-repo-standards`
 
-Install this repository as a Codex plugin from its GitHub source. The plugin manifest is `.codex-plugin/plugin.json` and includes all skill packages under `./skills/`, including nested `references/`, `scripts/`, and `agents/` files.
+Add this repository as a Codex plugin marketplace, then install **LT Agents** from that marketplace. The root plugin manifest `.codex-plugin/plugin.json` includes all skill packages under `./skills/`, including nested `references/`, `scripts/`, and `agents/` files.
 
-Restart Codex.
+```powershell
+codex plugin marketplace add LandonTomaine/LT-Agents --ref main
+```
+
+Restart Codex after installation.
 
 Run it from the repo you want to bootstrap:
 
@@ -65,9 +69,19 @@ Use $bootstrap-repo-standards to bootstrap this repo.
 
 ## Plugin Install
 
-This repository is packaged as a Codex plugin. The plugin manifest lives at `.codex-plugin/plugin.json` and points to `./skills/`, so each skill package includes its nested `references/`, `scripts/`, and `agents/` files when installed as a plugin.
+This repository is packaged as a Codex plugin and checked-in marketplace. Add the marketplace from GitHub, then install **LT Agents** from it:
 
-Install the plugin from this repository using Codex's standard plugin install flow for a GitHub plugin source. After install, restart Codex if needed and invoke the included skills by name, for example:
+```powershell
+codex plugin marketplace add LandonTomaine/LT-Agents --ref main
+```
+
+For a local clone:
+
+```powershell
+codex plugin marketplace add .
+```
+
+After installing the plugin, restart Codex if needed and invoke the included skills by name, for example:
 
 ```text
 Use $bootstrap-repo-standards to bootstrap this repo.
@@ -138,7 +152,7 @@ Restart Codex after installing or updating skills. `$skill-installer` installs i
 
 ## Plugin Distribution
 
-For broad public distribution, use the root Codex plugin manifest. Keep raw skill-folder install docs for local setup, testing, and private sharing.
+For broad public distribution, use the checked-in marketplace at `.agents/plugins/marketplace.json`. Keep raw skill-folder install docs for local setup, testing, and private sharing.
 
 ## Maintaining This Repo
 

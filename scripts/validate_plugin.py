@@ -13,6 +13,7 @@ from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
 PLUGIN_JSON = ROOT / ".codex-plugin" / "plugin.json"
+MARKETPLACE_JSON = ROOT / ".agents" / "plugins" / "marketplace.json"
 NAME_RE = re.compile(r"^[a-z0-9][a-z0-9-]{0,62}[a-z0-9]$")
 SEMVER_RE = re.compile(
     r"^(0|[1-9]\d*)\."
@@ -200,6 +201,52 @@ def validate_asset_path(
         errors.append(f"{field}: points to a missing file")
 
 
+def validate_marketplace(plugin_name: str) -> list[str]:
+    if not MARKETPLACE_JSON.is_file():
+        return [f"Missing plugin marketplace: {MARKETPLACE_JSON}"]
+
+    try:
+        data = json.loads(MARKETPLACE_JSON.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        return [f"Invalid JSON in {MARKETPLACE_JSON}: {exc}"]
+
+    errors: list[str] = []
+    if data.get("name") != plugin_name:
+        errors.append("marketplace.name: must match plugin.name")
+    interface = data.get("interface")
+    if not isinstance(interface, dict) or not isinstance(
+        interface.get("displayName"), str
+    ) or not interface["displayName"].strip():
+        errors.append("marketplace.interface.displayName: missing string")
+
+    plugins = data.get("plugins")
+    if not isinstance(plugins, list) or len(plugins) != 1:
+        errors.append("marketplace.plugins: must contain one plugin entry")
+        return errors
+
+    entry = plugins[0]
+    if not isinstance(entry, dict):
+        return [*errors, "marketplace.plugins[0]: must be an object"]
+    if entry.get("name") != plugin_name:
+        errors.append("marketplace.plugins[0].name: must match plugin.name")
+    source = entry.get("source")
+    if not isinstance(source, dict) or source.get("source") != "local":
+        errors.append("marketplace.plugins[0].source: must be a local source")
+    elif source.get("path") != "./":
+        errors.append("marketplace.plugins[0].source.path: must resolve to plugin root")
+    policy = entry.get("policy")
+    if not isinstance(policy, dict):
+        errors.append("marketplace.plugins[0].policy: missing object")
+    else:
+        if policy.get("installation") != "AVAILABLE":
+            errors.append("marketplace.plugins[0].policy.installation: must be AVAILABLE")
+        if policy.get("authentication") != "ON_INSTALL":
+            errors.append("marketplace.plugins[0].policy.authentication: must be ON_INSTALL")
+    if entry.get("category") != "Productivity":
+        errors.append("marketplace.plugins[0].category: must be Productivity")
+    return errors
+
+
 def main() -> int:
     if not PLUGIN_JSON.is_file():
         print(f"Missing plugin manifest: {PLUGIN_JSON}", file=sys.stderr)
@@ -323,7 +370,14 @@ def main() -> int:
             print(f"- {error}")
         return 1
 
-    print(f"Plugin validation passed: {PLUGIN_JSON}")
+    marketplace_errors = validate_marketplace(name)
+    if marketplace_errors:
+        print("Plugin validation failed:")
+        for error in marketplace_errors:
+            print(f"- {error}")
+        return 1
+
+    print(f"Plugin and marketplace validation passed: {PLUGIN_JSON}")
     return 0
 
 
